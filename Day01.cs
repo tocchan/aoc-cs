@@ -22,16 +22,26 @@ namespace AoC2021
             List<string> lines = Util.ReadFileToLines(InputFileA); 
             List<int> values = lines.Select(int.Parse).ToList(); 
 
-            int count = 0; 
-            for (int i = 1; i < values.Count; ++i)
+            int fuelSum = 0; 
+            for (int i = 0; i < values.Count; ++i)
             {
-                if (values[i] > values[i - 1])
-                {
-                    ++count; 
-                }
+                int value = values[i]; 
+                int fuel = (value / 3) - 2; 
+                fuelSum += fuel; 
             }
 
-            return count.ToString(); 
+            return fuelSum.ToString(); 
+        }
+
+        private int CalcFuelB(int mass)
+        {
+            int fuelCost = (mass / 3) - 2; 
+            if (fuelCost <= 0)
+            {
+                return 0; 
+            }
+
+            return fuelCost + CalcFuelB(fuelCost); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -40,20 +50,17 @@ namespace AoC2021
             List<string> lines = Util.ReadFileToLines(InputFileB); 
             List<int> values = lines.Select(int.Parse).ToList(); 
 
-            int count = 0; 
-            int prevSum = values[0] + values[1] + values[2]; 
-
-            for (int i = 3; i < values.Count; ++i)
+            int fuelSum = 0; 
+            for (int i = 0; i < values.Count; ++i)
             {
-                int sum = values[i] + values[i - 1] + values[i - 2]; 
-                if (sum > prevSum)
-                {
-                    ++count; 
-                }
-                prevSum = sum;
+                int value = values[i]; 
+                int fuel = CalcFuelB(value); 
+                // Util.WriteLine(fuel.ToString()); 
+
+                fuelSum += fuel; 
             }
 
-            return count.ToString(); 
+            return fuelSum.ToString(); 
         }
     }
 }
