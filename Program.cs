@@ -1,11 +1,11 @@
 ﻿using AoC2021;
 
-Day? day = Day.Create( args.FirstOrDefault(), typeof(Day01) );
+Day? day = Day.Create( args.FirstOrDefault(), typeof(Day02) );
 
 
 Util.WriteLine( @"[+white]                       /)"); 
 Util.WriteLine( @"[+white]              /\___/\ (("); 
-Util.WriteLine( @"[+white]              \`@_@'/  ))"); 
+Util.WriteLine( @"[+white]              \`[yellow]@[-]_[yellow]@[+white]'/  ))"); 
 Util.WriteLine( @"[+white]              {_:Y:.}_//" ); 
 Util.WriteLine( @"[+white]    ----------{_}^-'{_}----------"); 
 Util.WriteLine( @"[  cyan]           AoC.2019." + day.GetType().Name    ); 
