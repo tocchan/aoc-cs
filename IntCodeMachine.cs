@@ -11,13 +11,30 @@ namespace AoC2021
     //----------------------------------------------------------------------------------------------
     public class IntCodeMachine
     {
+        //----------------------------------------------------------------------------------------------
+        // Constants
+        private const int OP_ADD = 1; 
+        private const int OP_MULT = 2; 
+        private const int OP_INPUT = 3;
+        private const int OP_OUTPUT = 4;
+        private const int OP_JUMP_TRUE = 5; 
+        private const int OP_JUMP_FALSE = 6;
+        private const int OP_LESS = 7; 
+        private const int OP_EQUALS = 8;
+        private const int OP_HALT = 99; 
+
+        public delegate int ReadInputCB(); 
+        public delegate void WriteOutputCB(int val); 
+
+
+        //----------------------------------------------------------------------------------------------
         public int[] ResetIntCode = new int[0]; 
         public int[] IntCode = new int[0]; 
         public int Offset = 0; 
+        public int ParamOptions = 0; 
 
-        private const int OP_ADD = 1; 
-        private const int OP_MULT = 2; 
-        private const int OP_HALT = 99; 
+        public ReadInputCB? OnReadInput;
+        public WriteOutputCB? OnWriteOutput;
 
         //----------------------------------------------------------------------------------------------
         public IntCodeMachine()
@@ -50,6 +67,44 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        private int ReadNextOp()
+        {
+            int opCode = IntCode[Offset]; 
+            ++Offset; 
+            
+            int op = opCode % 100; 
+            ParamOptions = opCode / 100; // todo: convert this to binary so I'm not dividing as much reading params
+
+            return op; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private int ReadParam(int addr)
+        {
+            bool isAddr = (ParamOptions & 1) == 0; 
+            ParamOptions /= 10; 
+
+            return isAddr ? IntCode[addr] : addr; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private int ReadParam()
+        {
+            int addr = IntCode[Offset]; 
+            ++Offset; 
+            return ReadParam(addr); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void WriteParam(int val)
+        {
+            int addr = IntCode[Offset]; 
+            ++Offset; 
+
+            IntCode[addr] = val;
+        }
+
+        //----------------------------------------------------------------------------------------------
         private void RunAdd()
         {
             int srcA = IntCode[Offset + 0]; 
@@ -57,7 +112,7 @@ namespace AoC2021
             int dst = IntCode[Offset + 2]; 
             Offset += 3; 
 
-            IntCode[dst] = IntCode[srcA] + IntCode[srcB]; 
+            IntCode[dst] = ReadParam(srcA) + ReadParam(srcB); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -68,8 +123,71 @@ namespace AoC2021
             int dst = IntCode[Offset + 2]; 
             Offset += 3; 
 
-            IntCode[dst] = IntCode[srcA] * IntCode[srcB]; 
+            IntCode[dst] = ReadParam(srcA) * ReadParam(srcB); 
         }
+
+        //----------------------------------------------------------------------------------------------
+        private void RunInput()
+        {
+            int addr = IntCode[Offset]; 
+            Offset += 1; 
+
+            int input = (OnReadInput != null) ? OnReadInput() : 0; 
+            IntCode[addr] = input; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void RunOutput()
+        { 
+            int addr = IntCode[Offset]; 
+            Offset += 1; 
+
+            int output = ReadParam(addr); 
+            if (OnWriteOutput != null) {
+                OnWriteOutput(output); 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void RunJumpTrue()
+        {
+            int check = ReadParam();
+            int offset = ReadParam(); 
+            if (check != 0) {
+                Offset = offset;
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void RunJumpFalse()
+        {
+            int check = ReadParam();
+            int offset = ReadParam(); 
+            if (check == 0) {
+                Offset = offset;
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void RunLess()
+        {
+            int a = ReadParam(); 
+            int b = ReadParam(); 
+
+            int result = (a < b) ? 1 : 0; 
+            WriteParam(result);
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void RunEquals()
+        { 
+            int a = ReadParam(); 
+            int b = ReadParam(); 
+
+            int result = (a == b) ? 1 : 0; 
+            WriteParam(result);
+        }
+
 
         //----------------------------------------------------------------------------------------------
         private void Halt()
@@ -80,12 +198,16 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public void RunNextOp()
         {
-            int opCode = IntCode[Offset]; 
-            ++Offset; 
-
+            int opCode = ReadNextOp(); 
             switch (opCode) {
                 case OP_ADD: RunAdd(); break; 
                 case OP_MULT: RunMultiply(); break; 
+                case OP_INPUT: RunInput(); break;
+                case OP_OUTPUT: RunOutput(); break; 
+                case OP_JUMP_TRUE: RunJumpTrue(); break; 
+                case OP_JUMP_FALSE: RunJumpFalse(); break; 
+                case OP_LESS: RunLess(); break;
+                case OP_EQUALS: RunEquals(); break; 
                 case OP_HALT: Halt(); break; 
                 default: break; // nop
             }
@@ -96,6 +218,12 @@ namespace AoC2021
         {
             OP_ADD => 3,
             OP_MULT => 3, 
+            OP_INPUT => 1, 
+            OP_OUTPUT => 1, 
+            OP_JUMP_TRUE => 2,
+            OP_JUMP_FALSE => 2,
+            OP_LESS => 3,
+            OP_EQUALS => 3,
             OP_HALT => -1, 
             _ => 0
         };
