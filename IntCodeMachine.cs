@@ -33,6 +33,11 @@ namespace AoC2021
         public int Offset = 0; 
         public int ParamOptions = 0; 
 
+        public Queue<int> Inputs = new Queue<int>(); 
+        public Queue<int> Outputs = new Queue<int>(); 
+        public IntCodeMachine? InputProgram = null; 
+        public IntCodeMachine? OutputProgram = null; 
+
         public ReadInputCB? OnReadInput;
         public WriteOutputCB? OnWriteOutput;
 
@@ -48,6 +53,12 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public IntCodeMachine(string src)
+        {
+            Setup( src.Split(',').Select(int.Parse).ToArray() ); 
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void Setup(int[] intCode)
         {
             IntCode = new int[intCode.Length]; 
@@ -60,10 +71,87 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public void PipeTo( IntCodeMachine machine )
+        {
+            machine.InputProgram = this; 
+            OutputProgram = machine; 
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void Reset()
         {
             Array.Copy(ResetIntCode, 0, IntCode, 0, ResetIntCode.Length); 
             Offset = 0; 
+
+            Inputs.Clear(); 
+            Outputs.Clear(); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public void EnqueueInput( int val )
+        { 
+            Inputs.Enqueue(val); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool DequeueInput( out int val )
+        {
+            // callback method
+            val = 0; 
+            if (OnReadInput != null) {
+                val = OnReadInput.Invoke();
+                return true; 
+            }
+
+            // queue method
+            if (Inputs.Count == 0) {
+                // piping method
+                if (InputProgram != null) {
+                    // run my src until I have something
+                    InputProgram.RunUntil( () => { return InputProgram.HasOutput(); } ); 
+                    
+                    // get that thing
+                    int output;
+                    InputProgram.DequeueOutput( out output ); 
+                    EnqueueInput(output); 
+                } else {
+                    return false; 
+                }
+            }
+
+            val = Inputs.Dequeue(); 
+            return true; 
+        }
+        
+
+        //----------------------------------------------------------------------------------------------
+        public void SetInputs( params int[] inputs )
+        {
+            Inputs.Clear(); 
+            foreach (int val in inputs) {
+                EnqueueInput(val);
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public void EnqueueOutput( int val )
+        {
+            Outputs.Enqueue( val ); 
+            if (OnWriteOutput != null) {
+                OnWriteOutput( val ); 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool DequeueOutput( out int val )
+        {
+            return Outputs.TryDequeue( out val ); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool HasOutput()
+        {
+            return Outputs.Count > 0; 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -132,7 +220,11 @@ namespace AoC2021
             int addr = IntCode[Offset]; 
             Offset += 1; 
 
-            int input = (OnReadInput != null) ? OnReadInput() : 0; 
+            int input; 
+            if (!DequeueInput(out input)) {
+                Debug.Fail( "Program was not provided needed input." ); 
+            }
+
             IntCode[addr] = input; 
         }
 
@@ -143,9 +235,7 @@ namespace AoC2021
             Offset += 1; 
 
             int output = ReadParam(addr); 
-            if (OnWriteOutput != null) {
-                OnWriteOutput(output); 
-            }
+            EnqueueOutput( output );             
         }
 
         //----------------------------------------------------------------------------------------------
@@ -231,9 +321,23 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public void Run()
         {
-            while (Offset < IntCode.Length) {
+            while (!IsHalted()) {
                 RunNextOp(); 
             }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public void RunUntil( Func<bool> predicate )
+        {
+            while (!predicate() && !IsHalted()) {
+                RunNextOp(); 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool IsHalted()
+        {
+            return (Offset >= IntCode.Length); 
         }
 
         //----------------------------------------------------------------------------------------------

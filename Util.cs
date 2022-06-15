@@ -86,6 +86,16 @@ namespace AoC2021
             Console.WriteLine( ApplyMarkup(line) ); 
         }
 
+        public static void WriteArray<T>( IEnumerable<T> array )
+        {
+            WriteLine( array.ToString() + " {" ); 
+            foreach (T item in array) {
+                string itemStr = (item != null) ? item.ToString()! : "<null>"; 
+                WriteLine( "   " + itemStr + "," ); 
+            }
+            WriteLine( "}" ); 
+        }
+
         //----------------------------------------------------------------------------------------------
         public static (float, float) Quadratic( float a, float b, float c )
         {
@@ -106,6 +116,17 @@ namespace AoC2021
         public static int HexToByte( char c )
         {
             return (c <= '9') ? (c - '0') : (c - 'A' + 10); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public static List<int> GetIndexList(int count)
+        {
+            List<int> list = new List<int>(count); 
+            for (int i = 0; i < count; ++i) {
+                list.Add(i); 
+            }
+
+            return list; 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -164,6 +185,53 @@ namespace AoC2021
         {
             int[] initialSet = Enumerable.Range(0, setSize).ToArray(); 
             return PermutePairs( 0, initialSet ); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        // Returns all permuations of the set (in order)
+        // todo: contains a lot of sub allocations, could probably use an optimization pass if my 
+        public static IEnumerable<T[]> GetPermutations<T>(List<T> set)
+        {
+            if (set.Count <= 1) {
+                yield return set.ToArray(); 
+            } else {
+                List<T> setCopy = new List<T>(); 
+                setCopy.AddRange(set); 
+
+                for (int i = 0; i < set.Count; ++i) {
+                    T item = set[i]; 
+                    T[] perm = new T[set.Count]; 
+                    perm[0] = item; 
+
+                    setCopy.RemoveAt(i); 
+                    foreach (T[] subperm in GetPermutations<T>(setCopy)) {
+                        for (int j = 0; j < subperm.Length; ++j) {
+                            perm[j + 1] = subperm[j]; 
+                        } 
+                        yield return perm; 
+                    }
+                    setCopy.Insert(i, item); 
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public static IEnumerable<int[]> GetPermutations(int n)
+        {
+            List<int> indices = GetIndexList(n); 
+            return GetPermutations<int>(indices); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public static IEnumerable<int[]> GetPermutations(int minInclusive, int maxInclusive)
+        {
+            int count = maxInclusive - minInclusive + 1; 
+            List<int> indices = GetIndexList(count); 
+            for (int i = 0; i < indices.Count; ++i) {
+                indices[i] += minInclusive; 
+            }
+
+            return GetPermutations<int>(indices); 
         }
     }
 }
