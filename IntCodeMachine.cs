@@ -495,14 +495,16 @@ namespace AoC2021
                     sb.Append('\n'); 
                 }
 
+                // add a line number
+                string lineNumStr = lineNumber.ToString().PadLeft(6); 
+                ++lineNumber; 
+
+                string offsetStr = offset.ToString().PadRight(6); 
                 Int64 op = IntCode[offset] % 100; 
                 Int64 paramOptions = (IntCode[offset]) / 100; 
                 ++offset; 
 
-                // add a line number
-                string lineNumStr = lineNumber.ToString().PadLeft(5); 
-                ++lineNumber; 
-                sb.Append("[+black]" + lineNumStr + ".  "); 
+                sb.Append("[+cyan]" + lineNumStr + ". [+black]@" + offsetStr); 
 
                 Int64 paramCount = 0; 
                 if (op == OP_HALT) {
