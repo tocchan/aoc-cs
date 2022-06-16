@@ -21,6 +21,11 @@ namespace AoC2021
         private const Int64 OP_JUMP_FALSE = 6;
         private const Int64 OP_LESS = 7; 
         private const Int64 OP_EQUALS = 8;
+        private const Int64 OP_ADJUST_RELATIVE_HEAD = 9;
+
+        // special 
+        private const Int64 OP_FIRST = OP_ADD; 
+        private const Int64 OP_LAST = OP_ADJUST_RELATIVE_HEAD; 
         private const Int64 OP_HALT = 99; 
 
         public delegate Int64 ReadInputCB(); 
@@ -30,10 +35,14 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public Int64[] ResetIntCode = new Int64[0]; 
         public Int64[] IntCode = new Int64[0]; 
-        public List<Int64> Memory = new List<Int64>(); // any memory stored past the end of IntCode will be stored here.  Will default to zero if read without being written
+        public Int64[] Memory = new Int64[0]; // any memory stored past the end of IntCode will be stored here.  Will default to zero if read without being written
 
         public Int64 Offset = 0; 
         public Int64 ParamOptions = 0; 
+        public Int64 RelativeOffset = 0; 
+
+        public Int64 LowestMemoryAddress = Int64.MaxValue; 
+        public Int64 HighestMemoryAddress = 0; 
 
         public Queue<Int64> Inputs = new Queue<Int64>(); 
         public Queue<Int64> Outputs = new Queue<Int64>(); 
@@ -59,10 +68,15 @@ namespace AoC2021
             Setup(intCode); 
         }
 
+        public IntCodeMachine(IntCodeMachine toCopy)
+        {
+            Setup(toCopy.IntCode); 
+        }
+
         //----------------------------------------------------------------------------------------------
         public IntCodeMachine(string src)
         {
-            Setup( src.Split(',').Select(Int64.Parse).ToArray() ); 
+            SetupFromSource(src); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -70,11 +84,10 @@ namespace AoC2021
         {
             IntCode = new Int64[intCode.Length]; 
             ResetIntCode = new Int64[intCode.Length]; 
-
-            Array.Copy(intCode, 0, IntCode, 0, intCode.Length); 
             Array.Copy(intCode, 0, ResetIntCode, 0, intCode.Length); 
 
-            Offset = 0; 
+            // will setup the int code to the reset int code
+            Reset(); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -89,6 +102,19 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public void SetupFromSource( string src )
+        {
+            Setup( src.Split(',').Select(Int64.Parse).ToArray() ); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public void SetupFromFile( string filename )
+        {
+            string src = string.Join(null, Util.ReadFileToLines(filename)); 
+            SetupFromSource( src ); 
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void PipeTo( IntCodeMachine machine )
         {
             machine.InputProgram = this; 
@@ -99,11 +125,15 @@ namespace AoC2021
         public void Reset()
         {
             Array.Copy(ResetIntCode, 0, IntCode, 0, ResetIntCode.Length); 
-            Offset = 0; 
 
             Inputs.Clear(); 
             Outputs.Clear();
-            Memory.Clear(); 
+            Memory = new Int64[0]; 
+
+            Offset = 0; 
+            RelativeOffset = 0; 
+            LowestMemoryAddress = Int64.MaxValue; 
+            HighestMemoryAddress = 0; 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -186,12 +216,60 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        private Int64 ReadMemory(Int64 addr)
+        {
+            Debug.Assert(addr >= 0); // if negative, ignore it
+            if (addr < IntCode.Length) {
+                return IntCode[addr]; 
+            } else {
+                Int64 memAddr = addr - IntCode.Length; 
+                return (memAddr < Memory.Length) ? Memory[memAddr] : 0; 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void GrowMemoryToFit(Int64 memAddr)
+        {
+            Int64 memSize = Math.Max( Memory.Length, 4096 ); 
+            while (memAddr >= memSize) {
+                memSize *= 2; 
+            }
+
+            Int64[] newMemory = new long[memSize]; 
+            Memory.CopyTo(newMemory, 0); 
+            Memory = newMemory; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void WriteMemory(Int64 addr, Int64 val)
+        {
+            Debug.Assert(addr >= 0); 
+            if (addr < IntCode.Length) {
+                IntCode[addr] = val; 
+            } else {
+                Int64 memAddr = addr - IntCode.Length; 
+                if (memAddr > Memory.Length) {
+                    GrowMemoryToFit(memAddr); 
+                }
+
+                LowestMemoryAddress = Math.Min(memAddr, LowestMemoryAddress); 
+                HighestMemoryAddress = Math.Max(memAddr, HighestMemoryAddress); 
+                Memory[memAddr] = val; 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
         private Int64 ReadParam(Int64 addr)
         {
-            bool isAddr = (ParamOptions & 1) == 0; 
+            Int64 addrMode = ParamOptions % 10; 
             ParamOptions /= 10; 
 
-            return isAddr ? IntCode[addr] : addr; 
+            return addrMode switch {
+                0 => ReadMemory(addr), 
+                1 => addr, 
+                2 => ReadMemory(RelativeOffset + addr),
+                _ => addr
+            }; 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -205,10 +283,11 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         private void WriteParam(Int64 val)
         {
+            // todo: so far it has said write addresses are always direct, but man if I'm not skeptical
             Int64 addr = IntCode[Offset]; 
             ++Offset; 
 
-            IntCode[addr] = val;
+            WriteMemory(addr, val); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -216,10 +295,9 @@ namespace AoC2021
         {
             Int64 srcA = IntCode[Offset + 0]; 
             Int64 srcB = IntCode[Offset + 1]; 
-            Int64 dst = IntCode[Offset + 2]; 
-            Offset += 3; 
+            Offset += 2; 
 
-            IntCode[dst] = ReadParam(srcA) + ReadParam(srcB); 
+            WriteParam(ReadParam(srcA) + ReadParam(srcB)); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -227,10 +305,9 @@ namespace AoC2021
         {
             Int64 srcA = IntCode[Offset + 0]; 
             Int64 srcB = IntCode[Offset + 1]; 
-            Int64 dst = IntCode[Offset + 2]; 
-            Offset += 3; 
+            Offset += 2; 
 
-            IntCode[dst] = ReadParam(srcA) * ReadParam(srcB); 
+            WriteParam(ReadParam(srcA) * ReadParam(srcB)); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -244,7 +321,7 @@ namespace AoC2021
                 Debug.Fail( "Program was not provided needed input." ); 
             }
 
-            IntCode[addr] = input; 
+            WriteMemory(addr, input); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -297,6 +374,12 @@ namespace AoC2021
             WriteParam(result);
         }
 
+        //----------------------------------------------------------------------------------------------
+        private void RunAdjustRelativeHead()
+        {
+            Int64 value = ReadParam(); 
+            RelativeOffset += value; 
+        }
 
         //----------------------------------------------------------------------------------------------
         private void Halt()
@@ -317,10 +400,14 @@ namespace AoC2021
                 case OP_JUMP_FALSE: RunJumpFalse(); break; 
                 case OP_LESS: RunLess(); break;
                 case OP_EQUALS: RunEquals(); break; 
+                case OP_ADJUST_RELATIVE_HEAD: RunAdjustRelativeHead(); break;
                 case OP_HALT: Halt(); break; 
                 default: break; // nop
             }
         }
+
+        //----------------------------------------------------------------------------------------------
+        public bool IsOp(Int64 op) => ((op >= OP_FIRST) && (op <= OP_LAST)) || (op == OP_HALT); 
 
         //----------------------------------------------------------------------------------------------
         public Int64 GetParamCount(Int64 op) => op switch
@@ -333,9 +420,26 @@ namespace AoC2021
             OP_JUMP_FALSE => 2,
             OP_LESS => 3,
             OP_EQUALS => 3,
+            OP_ADJUST_RELATIVE_HEAD => 1,
             OP_HALT => -1, 
             _ => 0
         };
+
+        //----------------------------------------------------------------------------------------------
+        public string OpToString(Int64 op) => op switch 
+        {
+            OP_ADD => "add",
+            OP_MULT => "mul", 
+            OP_INPUT => "in ", 
+            OP_OUTPUT => "out", 
+            OP_JUMP_TRUE => "jpt",
+            OP_JUMP_FALSE => "jpf",
+            OP_LESS => "ls ",
+            OP_EQUALS => "eql",
+            OP_ADJUST_RELATIVE_HEAD => "rel",
+            OP_HALT => "end", 
+            _ => op.ToString()
+        }; 
 
         //----------------------------------------------------------------------------------------------
         public void Run()
@@ -371,39 +475,89 @@ namespace AoC2021
             return IntCode[idx]; 
         }
 
+        private string ParamOptionToString(Int64 option) => option switch
+        {
+            0 => "@",
+            1 => "",
+            2 => "R",
+            _ => "???"
+        };
+
         //----------------------------------------------------------------------------------------------
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(); 
             Int64 offset = 0; 
 
+            int lineNumber = 1; 
             while (offset < IntCode.Length) {
                 if (offset != 0) {
                     sb.Append('\n'); 
                 }
 
-                Int64 op = IntCode[offset]; 
+                Int64 op = IntCode[offset] % 100; 
+                Int64 paramOptions = (IntCode[offset]) / 100; 
                 ++offset; 
+
+                // add a line number
+                string lineNumStr = lineNumber.ToString().PadLeft(5); 
+                ++lineNumber; 
+                sb.Append("[+black]" + lineNumStr + ".  "); 
 
                 Int64 paramCount = 0; 
                 if (op == OP_HALT) {
-                    paramCount = IntCode.Length - offset;
                     sb.Append("[red]"); 
-                    sb.Append(op.ToString()); 
-                    sb.Append("\n[+black]"); 
-                } else {
+                    sb.Append(OpToString(op)); 
+                } else if (IsOp(op)) {
                     paramCount = GetParamCount(op); 
                     sb.Append("[+green]"); 
-                    sb.Append(op.ToString()); 
+                    sb.Append(OpToString(op)); 
                     sb.Append(" [cyan]"); 
+                } else {
+                    sb.Append("[+black]"); 
+                    sb.Append(op.ToString()); 
+
+                    // keep appending bytes until we find the next op code
+                    op = IntCode[offset] % 100; 
+                    while (!IsOp(op)) {
+                        ++offset;
+                        sb.Append(' '); 
+                        sb.Append(op.ToString()); 
+                        op = IntCode[offset] % 100; 
+                    }
                 }
 
                 for (Int64 i = 0; i < paramCount; ++i) {
+                    Int64 paramOption = paramOptions % 10; 
+                    paramOptions /= 10; 
+
+                    sb.Append(ParamOptionToString(paramOption));
                     sb.Append(IntCode[offset + i]); 
                     sb.Append(' '); 
                 }
 
                 offset += paramCount; 
+            }
+
+            /*
+            // append memory built into int-code
+            sb.Append("\n\n[+white] : built-in memory @[+green]" + offset + "[+white] <[+black] "); 
+            while (offset < IntCode.Length) {
+                sb.Append(IntCode[offset]); 
+                sb.Append(' '); 
+                ++offset; 
+            }
+            sb.Append("[+white]>"); 
+            */
+
+            // append memory created during runtime
+            if (LowestMemoryAddress <= HighestMemoryAddress) {
+                sb.Append("\n\n[+white] : allocated memory @[+green]" + (IntCode.Length + LowestMemoryAddress) + "[+white] <[+black] "); 
+                for (Int64 i = LowestMemoryAddress; i < HighestMemoryAddress + 1; ++i) {
+                    sb.Append(Memory[i]); 
+                    sb.Append(' '); 
+                }
+                sb.Append("[+white]>"); 
             }
 
             return sb.ToString(); 
