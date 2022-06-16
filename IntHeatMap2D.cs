@@ -78,6 +78,8 @@ namespace AoC2021
             Height = height; 
             Data = newData; 
         }
+
+        //----------------------------------------------------------------------------------------------
         public void Resize( ivec2 size, bool keep = false ) => Resize( size.x, size.y, keep ); 
 
         //----------------------------------------------------------------------------------------------
@@ -103,6 +105,8 @@ namespace AoC2021
                 }
             }
         }
+
+        //----------------------------------------------------------------------------------------------
         public void Copy( IntHeatMap2D src, int srcX, int srcY, int width, int height, int dstX, int dstY )
         {
             width = Math.Min( GetWidth() - dstX, width ); 
@@ -166,6 +170,14 @@ namespace AoC2021
         public void Set( ivec2 pos, int value ) => Set( pos.x, pos.y, value ); 
 
         //----------------------------------------------------------------------------------------------
+        public void Set( int offset, int val )
+        {
+            if ((offset >= 0) && (offset < Data.Length)) {
+                Data[offset] = val;
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void SetAll( int value )
         {
             for (int i = 0; i < Data.Length; ++i)
@@ -175,6 +187,12 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public int Get( int offset )
+        {
+            return ((offset >= 0) && (offset < Data.Length)) ? Data[offset] : BoundsValue; 
+        }
+
+   
         public int Get( int x, int y )
         {
             if ((y >= 0) && (y < Height) && (x >= 0) && (x < Width))
@@ -240,6 +258,8 @@ namespace AoC2021
         public int GetWidth() => Width; 
         public int GetHeight() => Height; 
 
+        //----------------------------------------------------------------------------------------------
+        // Operators
         public int this[int x, int y]
         {
             get => Get(x, y);
@@ -250,6 +270,12 @@ namespace AoC2021
         {
             get => Get(p.x, p.y); 
             set => Set(p.x, p.y, value); 
+        }
+
+        public int this[int offset]
+        {
+            get => Get(offset); 
+            set => Set(offset, value); 
         }
 
         //----------------------------------------------------------------------------------------------
