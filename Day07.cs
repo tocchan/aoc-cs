@@ -28,10 +28,10 @@ namespace AoC2021
         {
             IntCodeMachine machine = new IntCodeMachine(IntCode); 
 
-            int maxPower = 0; 
+            Int64 maxPower = 0; 
             foreach (int[] perm in Util.GetPermutations(5)) {
                 // int[] perm = new int[] { 0, 1, 2, 3, 4 }; 
-                int power = 0; 
+                Int64 power = 0; 
                 for (int i = 0; i < perm.Length; ++i) {
                     machine.Reset(); 
                     machine.SetInputs( perm[i], power ); 
@@ -51,7 +51,7 @@ namespace AoC2021
             // IntCodeMachine machine = new IntCodeMachine("3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5"); 
             IntCodeMachine machine = new IntCodeMachine(IntCode); 
 
-            int maxPower = 0; 
+            Int64 maxPower = 0; 
             foreach (int[] perm in Util.GetPermutations(5, 9)) {
 
                 // setup machines with their permuation code
@@ -72,7 +72,7 @@ namespace AoC2021
                 amplifiers[4].Run(); 
 
                 // get the final output and see if it is the max
-                int output;
+                Int64 output;
                 amplifiers[4].DequeueOutput( out output ); 
                 maxPower = Math.Max(output, maxPower); 
             }

@@ -50,7 +50,7 @@ namespace AoC2021
                     machine.Set(2, j); 
 
                     machine.Run();
-                    int result = machine.Get(0); 
+                    Int64 result = machine.Get(0); 
                     if (result == 19690720) {
                         return (100 * i + j).ToString(); 
                     }

@@ -26,10 +26,10 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public override string RunA()
         {
-            int programOutput = 0; 
+            Int64 programOutput = 0; 
             IntCodeMachine machine = new IntCodeMachine(IntCode); 
             machine.OnReadInput = () => 1; 
-            machine.OnWriteOutput = (int output) => { 
+            machine.OnWriteOutput = (Int64 output) => { 
                 Util.WriteLine( "IntCode Out: " + output ); 
                 programOutput = output; 
             }; 
@@ -41,10 +41,10 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public override string RunB()
         {
-            int programOutput = 0; 
+            Int64 programOutput = 0; 
             IntCodeMachine machine = new IntCodeMachine(IntCode); 
             machine.OnReadInput = () => 5; 
-            machine.OnWriteOutput = (int output) => { 
+            machine.OnWriteOutput = (Int64 output) => { 
                 Util.WriteLine( "IntCode Out: " + output ); 
                 programOutput = output; 
             }; 
