@@ -8,7 +8,7 @@ namespace AoC2021
 {
     internal class Day09 : Day
  {
-        private string InputFile = "inputs/07.txt"; 
+        private string InputFile = "inputs/09.txt"; 
         IntCodeMachine Program = new IntCodeMachine(); 
 
         //----------------------------------------------------------------------------------------------
@@ -20,20 +20,23 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public override string RunA()
         {
-            // Program.EnqueueInput(1); 
-            // Program.EnqueueInput(0); 
-            // Program.Run();
+            // Util.WriteLine(Program.ToString()); 
 
-            Util.WriteLine(Program.ToString()); 
-            Util.WriteLine(""); 
+            Program.Reset(); 
+            Program.EnqueueInput(1); 
+            Program.Run();
 
-            return ""; 
+            return Program.TryDequeueOutput().ToString(); 
         }
 
         //----------------------------------------------------------------------------------------------
         public override string RunB()
         {
-            return ""; 
+            Program.Reset(); 
+            Program.EnqueueInput(2); 
+            Program.Run(); 
+
+            return Program.TryDequeueOutput().ToString(); 
         }
     }
 }

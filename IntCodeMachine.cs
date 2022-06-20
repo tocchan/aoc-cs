@@ -198,6 +198,17 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public Int64 TryDequeueOutput( Int64 defValue = 0 )
+        {
+            Int64 val; 
+            if (DequeueOutput( out val )) {
+                return val;
+            } else {
+                return defValue; 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
         public bool HasOutput()
         {
             return Outputs.Count > 0; 
@@ -243,6 +254,15 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         private void WriteMemory(Int64 addr, Int64 val)
         {
+            Int64 mode = PopAddressMode(); 
+            Debug.Assert(mode != 1); // no idea what this would mean
+            addr = mode switch {
+                0 => addr, 
+                1 => addr, 
+                2 => RelativeOffset + addr, 
+                _ => addr, 
+            };
+
             Debug.Assert(addr >= 0); 
             if (addr < IntCode.Length) {
                 IntCode[addr] = val; 
@@ -259,11 +279,18 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
-        private Int64 ReadParam(Int64 addr)
+        private Int64 PopAddressMode()
         {
             Int64 addrMode = ParamOptions % 10; 
             ParamOptions /= 10; 
 
+            return addrMode; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private Int64 ReadParam(Int64 addr)
+        {
+            Int64 addrMode = PopAddressMode(); 
             return addrMode switch {
                 0 => ReadMemory(addr), 
                 1 => addr, 
