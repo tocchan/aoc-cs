@@ -233,5 +233,20 @@ namespace AoC2021
 
             return GetPermutations<int>(indices); 
         }
+
+        //----------------------------------------------------------------------------------------------
+        public static int GCD( int num, int den )
+        {
+            num = Math.Abs(num); 
+            den = Math.Abs(den); 
+
+            while ((num * den) != 0) {
+                int r = num % den; 
+                num = den; 
+                den = r; 
+            }
+            
+            return Math.Max(num, den); 
+        }
     }
 }
