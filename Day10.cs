@@ -8,7 +8,7 @@ namespace AoC2021
 {
     internal class Day10 : Day
  {
-        private string InputFile = "inputs/10.txt"; 
+        private string InputFile = "inputs/10d.txt"; 
         private List<vec2> Asteroids = new List<vec2>();
 
         private vec2 StationPosition = vec2.ZERO; 
@@ -21,7 +21,7 @@ namespace AoC2021
                 for (int x = 0; x < lines[y].Length; ++x) {
                     char c = lines[y][x]; 
                     if (c == '#') {
-                        vec2 pos = new vec2( (float)x + 0.5f, (float)y + 0.5f ); 
+                        vec2 pos = new vec2( (float)x, (float)y ); 
                         Asteroids.Add(pos); 
                     }
                 }
@@ -48,18 +48,22 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         private int GetVisibleAsteroids(int idx)
         {
-            int count = 0; 
+            HashSet<int> uniques = new HashSet<int>(); 
+            vec2 asteroid = Asteroids[idx]; 
+
             for (int i = 0; i < Asteroids.Count; ++i) {
                 if (i == idx) {
                     continue; 
                 }
 
-                if (HasLineOfSight(idx, i)) {
-                    ++count;
-                }
+                ivec2 disp = vec2.RoundToInt(Asteroids[i] - asteroid); 
+                int gdc = Util.GCD( disp.x, disp.y ); 
+                disp  = disp / gdc; 
+                int key = 10000 * disp.x + disp.y; 
+                uniques.Add(key); 
             }
 
-            return count; 
+            return uniques.Count;
         }
 
         //----------------------------------------------------------------------------------------------

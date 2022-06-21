@@ -57,6 +57,7 @@ namespace AoC2021
         public static ivec2 operator *( ivec2 a, ivec2 b ) => new ivec2( a.x * b.x, a.y * b.y ); 
         public static ivec2 operator *( int a, ivec2 v ) => new ivec2( a * v.x, a * v.y ); 
         public static ivec2 operator *( ivec2 v, int a ) => new ivec2( a * v.x, a * v.y ); 
+        public static ivec2 operator /( ivec2 v, int a ) => new ivec2( v.x / a, v.y / a ); 
         public static bool operator ==( ivec2 a, ivec2 b ) => (a.x == b.x) && (a.y == b.y); 
         public static bool operator !=( ivec2 a, ivec2 b ) => (a.x != b.x) || (a.y != b.y); 
         public static bool operator < ( ivec2 a, ivec2 b ) => (a.x < b.x) && (a.y < b.y); 
