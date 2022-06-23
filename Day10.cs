@@ -8,7 +8,7 @@ namespace AoC2021
 {
     internal class Day10 : Day
  {
-        private string InputFile = "inputs/10d.txt"; 
+        private string InputFile = "inputs/10.txt"; 
         private List<vec2> Asteroids = new List<vec2>();
 
         private vec2 StationPosition = vec2.ZERO; 
@@ -57,7 +57,7 @@ namespace AoC2021
                 }
 
                 ivec2 disp = vec2.RoundToInt(Asteroids[i] - asteroid); 
-                int gdc = Util.GCD( disp.x, disp.y ); 
+                int gdc = (int) Util.GCD( disp.x, disp.y ); 
                 disp  = disp / gdc; 
                 int key = 10000 * disp.x + disp.y; 
                 uniques.Add(key); 

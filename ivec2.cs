@@ -38,6 +38,13 @@ namespace AoC2021
         public int Sum() => x + y; 
         public int Product() => x * y; 
 
+        public ivec2 GetRotatedLeft() => new ivec2(y, -x); 
+        public void RotateLeft() => this = GetRotatedLeft(); 
+
+        public ivec2 GetRotatedRight() => new ivec2(-y, x); 
+        public void RotateRight() => this =  GetRotatedRight(); 
+
+
         public int Dot( ivec2 v ) => x * v.x + y * v.y; 
         public int GetLengthSquared() => x * x + y * y; 
         public float GetLength() => MathF.Sqrt( (float) GetLengthSquared() ); 

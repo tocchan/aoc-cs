@@ -235,13 +235,13 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
-        public static int GCD( int num, int den )
+        public static Int64 GCD( Int64 num, Int64 den )
         {
             num = Math.Abs(num); 
             den = Math.Abs(den); 
 
             while ((num * den) != 0) {
-                int r = num % den; 
+                Int64 r = num % den; 
                 num = den; 
                 den = r; 
             }

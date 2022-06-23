@@ -105,11 +105,24 @@ namespace AoC2021
 
         public static ivec3 Parse( string s )
         {
-            string[] parts = s.Split(',', 3); 
-            int x = int.Parse(parts[0]); 
-            int y = int.Parse(parts[1]); 
-            int z = int.Parse(parts[2]); 
-            return new ivec3( x, y, z );  
+            s = s.Trim(); 
+            if (string.IsNullOrEmpty(s)) {
+                return ivec3.ZERO; 
+            }
+
+            if (s.Contains('x') && (s.First() == '<') && s.EndsWith('>')) {
+                // <x=#, y=#, z=#> format?
+                s = s.Substring(1, s.Length - 2); 
+                int[] compParts = s.Split(',').Select((string p) => { return int.Parse(p.Split('=')[1]); }).ToArray(); 
+                return new ivec3( compParts[0], compParts[1], compParts[2] ); 
+            } else {
+                // assume "#, #, #" format
+                string[] parts = s.Split(',', 3); 
+                int x = int.Parse(parts[0]); 
+                int y = int.Parse(parts[1]); 
+                int z = int.Parse(parts[2]); 
+                return new ivec3( x, y, z );  
+            }
         }
 
         public override bool Equals([NotNullWhen(true)] object? obj)
