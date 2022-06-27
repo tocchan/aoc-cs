@@ -87,6 +87,41 @@ namespace AoC2021
             return ret; 
         }
 
+        public static ivec2 Mod( ivec2 val, int den )
+        {
+            int x = val.x % den; 
+            int y = val.y % den; 
+
+            if (x < 0) {
+                x += den; 
+            }
+            if (y < 0) {
+                y += den; 
+            }
+
+            return new ivec2(x, y); 
+        }
+
+        public static ivec2 FloorToBoundary(ivec2 val, int boundary)
+        {
+            ivec2 offset = ivec2.Mod(val, boundary); 
+            if (offset == ivec2.ZERO) {
+                return val; 
+            }
+
+            return val - offset; 
+        }
+
+        public static ivec2 CeilToBoundary(ivec2 val, int boundary)
+        {
+            ivec2 offset = ivec2.Mod(val, boundary); 
+            if (offset == ivec2.ZERO) {
+                return offset; 
+            }
+
+            return val + (new ivec2(boundary) - offset); 
+        }
+
         public static int Dot( ivec2 a, ivec2 b ) => a.x * b.x + a.y * b.y; 
 
         public static ivec2 Parse( string s )

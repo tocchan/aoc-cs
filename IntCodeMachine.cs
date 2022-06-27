@@ -215,6 +215,12 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public bool HasInput()
+        {
+            return Inputs.Count > 0; 
+        }
+
+        //----------------------------------------------------------------------------------------------
         private Int64 ReadNextOp()
         {
             Int64 opCode = IntCode[Offset]; 
@@ -480,8 +486,35 @@ namespace AoC2021
         public void RunUntil( Func<bool> predicate )
         {
             while (!predicate() && !IsHalted()) {
+                RunNextOp();
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool RunUntilRequiresInput(Int64 opCode)
+        { 
+            while (!IsHalted()) {
+                Int64 nextOp = IntCode[Offset] & 63; // as long as int codes go above 63 we're good
+                if ((nextOp == OP_INPUT) && !HasInput()) {
+                    return true; 
+                }
+            }
+
+            return false; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool RunUntilHasOutput(int numOutputs = 1)
+        { 
+            while (!IsHalted()) {
+                if (Outputs.Count >= numOutputs) {
+                    return true; 
+                }
+
                 RunNextOp(); 
             }
+
+            return false; 
         }
 
         //----------------------------------------------------------------------------------------------
