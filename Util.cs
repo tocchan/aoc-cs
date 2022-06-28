@@ -86,6 +86,7 @@ namespace AoC2021
             Console.WriteLine( ApplyMarkup(line) ); 
         }
 
+        //----------------------------------------------------------------------------------------------
         public static void WriteArray<T>( IEnumerable<T> array )
         {
             WriteLine( array.ToString() + " {" ); 
@@ -110,6 +111,17 @@ namespace AoC2021
             float ansB = (-b + inner) / (2 * a); 
 
             return (ansA, ansB); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public static Int64 CeilToBoundary( Int64 val, Int64 boundary )
+        {
+            Int64 rem = val % boundary; 
+            if (rem == 0) {
+                return val; 
+            } else {
+                return val + (boundary - rem); 
+            }
         }
 
         //----------------------------------------------------------------------------------------------
