@@ -70,44 +70,6 @@ namespace AoC2021
 
             Map.SetValue(ivec2.ZERO, 1);
 
-            /*
-            Program.OnReadInput = Int64() => {
-                
-                // draw map and get input
-                System.Console.Clear(); 
-                int oldVal = map.SetValue(position, 4); 
-                Util.WriteLine(map.ToString(" .█oD")); 
-
-                ConsoleKeyInfo key = System.Console.ReadKey();
-                int dir = key.Key switch {
-                    ConsoleKey.UpArrow => 1, 
-                    ConsoleKey.DownArrow => 2,
-                    ConsoleKey.LeftArrow => 3,
-                    ConsoleKey.RightArrow => 4,
-                    _ => 1
-                };
-                map.SetValue(position, oldVal); 
-
-                lastDir = dir switch {
-                    1 => ivec2.UP, 
-                    2 => ivec2.DOWN, 
-                    3 => ivec2.LEFT,
-                    4 => ivec2.RIGHT,
-                    _ => ivec2.ZERO
-                };
-
-                return dir; 
-            };
-
-            Program.OnWriteOutput = (Int64 val) => {
-                switch (val) {
-                    case 0: map.SetValue(position + lastDir, 2); break;
-                    case 1: position += lastDir; map.SetValue(position, 1); break; 
-                    case 2: position += lastDir; map.SetValue(position, 3); break; 
-                }
-            };
-            */
-
             while (true) {
                 List<ivec2> path = Map.FindPathTo( Position, 
                     bool(ivec2 pos, int val) => val == 0, 
