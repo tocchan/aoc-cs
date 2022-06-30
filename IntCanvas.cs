@@ -319,6 +319,9 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public ivec2 GetModifiedSize() => MaxSet - MinSet + ivec2.ONE; 
+
+        //----------------------------------------------------------------------------------------------
         public int Automata( Func<ivec2, int, int> rule )
         {
             int tilesChanged = 0; 

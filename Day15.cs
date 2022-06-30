@@ -113,6 +113,9 @@ namespace AoC2021
             System.Console.Clear(); 
             Console.CursorVisible = false; 
 
+            ivec2 size = Map.GetModifiedSize() + ivec2.ONE * 2; 
+            Console.SetWindowSize(size.x, size.y); 
+
             int steps = 0; 
             while (Map.Automata(Rule) != 0) {
                 ++steps; 
@@ -120,7 +123,6 @@ namespace AoC2021
                 // draw map and get input
                 Console.SetCursorPosition(0, 0); 
                 Util.WriteLine(Map.ToString(" .█oD")); 
-
                 Thread.Sleep(15); 
             }
 
