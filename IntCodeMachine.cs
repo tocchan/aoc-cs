@@ -483,6 +483,23 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public Int64[] Call( params Int64[] inputs )
+        {
+            for (int i = 0; i < inputs.Length; ++i) {
+                EnqueueInput(inputs[i]); 
+            }
+
+            RunUntilRequiresInput(); 
+
+            Int64[] outputs = new Int64[Outputs.Count]; 
+            for (int i = 0; i < outputs.Length; ++i) {
+                outputs[i] = Outputs.Dequeue(); 
+            }
+
+            return outputs; 
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void RunUntil( Func<bool> predicate )
         {
             while (!predicate() && !IsHalted()) {
@@ -491,13 +508,15 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
-        public bool RunUntilRequiresInput(Int64 opCode)
+        public bool RunUntilRequiresInput()
         { 
             while (!IsHalted()) {
-                Int64 nextOp = IntCode[Offset] & 63; // as long as int codes go above 63 we're good
+                Int64 nextOp = IntCode[Offset] % 100; // as long as int codes go above 63 we're good
                 if ((nextOp == OP_INPUT) && !HasInput()) {
                     return true; 
                 }
+
+                RunNextOp(); 
             }
 
             return false; 

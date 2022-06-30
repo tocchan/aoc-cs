@@ -37,6 +37,13 @@ namespace AoC2021
             z = zv; 
         }
 
+        public ivec3( ivec2 xy, int zv )
+        {
+            x = xy.x; 
+            y = xy.y; 
+            z = zv; 
+        }
+
         public ivec3( (int,int,int) t )
         {
             (x, y, z) = t; 
@@ -61,6 +68,19 @@ namespace AoC2021
                     case 2: z = value; break; 
                     default: break; 
                 }
+            }
+        }
+
+        public ivec2 xy
+        {
+            get
+            {
+                return new ivec2(x, y); 
+            }
+            set
+            {
+                x = value.x; 
+                y = value.y; 
             }
         }
 

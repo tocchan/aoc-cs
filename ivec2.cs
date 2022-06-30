@@ -22,7 +22,6 @@ namespace AoC2021
         public static readonly ivec2 DOWN = new ivec2(0, 1); 
 
 
-
         public ivec2( int v )
         {
             x = v; 

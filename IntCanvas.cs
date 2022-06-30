@@ -88,19 +88,18 @@ namespace AoC2021
         public int SetValue(int x, int y, int val) => SetValue(new ivec2(x, y), val); 
 
         //----------------------------------------------------------------------------------------------
-        private void GrowToFit(ivec2 pos)
+        private void GrowToFit( ivec2 min, ivec2 max )
         {
-            if ((pos >= Min) && (pos < (Min + Size))) {
-                return; 
+            ivec2 maxSize = Min + Size; 
+            if ((min >= Min) && (max < maxSize)) {
+                return;
             }
 
-            ivec2 newMin = ivec2.Min(pos, Min); 
-            ivec2 newMax = ivec2.Max(pos, Min + Size + ivec2.ONE); 
-            ivec2 newSize = newMax - newMin; 
-
+            ivec2 newMin = ivec2.Min(min, Min); 
+            ivec2 newMax = ivec2.Max(max, maxSize); 
+            ivec2 newSize = newMax - newMin + ivec2.ONE; 
             newMin = ivec2.FloorToBoundary(newMin, 64); 
             newSize = ivec2.CeilToBoundary(newSize, 64); 
-
 
             int[] newData = new int[newSize.Product()]; 
             for (int i = 0; i < newData.Length; ++i) {
@@ -120,6 +119,27 @@ namespace AoC2021
             Min = newMin; 
             Size = newSize; 
             Data = newData; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void GrowToFit(ivec2 pos)
+        {
+            if ((pos >= Min) && (pos < (Min + Size))) {
+                return; 
+            }
+
+            GrowToFit(pos, pos);
+
+            ivec2 newMin = ivec2.Min(pos, Min); 
+            ivec2 newMax = ivec2.Max(pos, Min + Size + ivec2.ONE); 
+            
+        }
+
+        
+        //----------------------------------------------------------------------------------------------
+        public void Reserve(ivec2 min, ivec2 max)
+        {
+            GrowToFit(min, max); 
         }
 
         //----------------------------------------------------------------------------------------------
@@ -162,7 +182,6 @@ namespace AoC2021
             return count; 
         }
 
-
         //----------------------------------------------------------------------------------------------
         public string ToString( string pal )
         {
@@ -187,6 +206,140 @@ namespace AoC2021
             }
 
             return sb.ToString(); 
+        }
+
+        private bool IsInBounds( ivec2 p )
+        {
+            return (p >= MinSet) && (p <= MaxSet); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private void EnqueueDir( PriorityQueue<ivec3, int> toVisit, IntCanvas visited, int v, ivec2 pos, Func<ivec2,int,int> h )
+        {
+            // this is a wall
+            int w = h(pos, GetValue(pos)); 
+            if (w < 0) {
+                return; 
+            }
+            w = v + w + 1; ; // always be at least one; 
+
+            // hasn't been searched, so we can search it soon
+            if (v < visited.GetValue(pos)) {
+                toVisit.Enqueue(new ivec3(pos, w), w); 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private ivec2 GetPreviousTile( IntCanvas weights, ivec2 p )
+        {
+            int minIdx = 0; 
+            int minWeight = int.MaxValue; 
+
+
+            ivec2[] dirs = { ivec2.RIGHT, ivec2.LEFT, ivec2.UP, ivec2.DOWN }; 
+            for (int i = 0; i < 4; ++i) {
+                int w = weights.GetValue(p + dirs[i]); 
+                if (w < minWeight) {
+                    minIdx = i; 
+                    minWeight = w; 
+                }
+            }
+
+            return p + dirs[minIdx]; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        private List<ivec2> ComputePath( ivec2 end, IntCanvas weights )
+        {
+            List<ivec2> path = new List<ivec2>(); 
+
+            ivec2 cursor = end; 
+            while (weights.GetValue(cursor) != 1) {
+                ivec2 prev = GetPreviousTile( weights, cursor ); 
+                path.Add( cursor - prev ); 
+                cursor = prev; 
+            }
+
+            path.Reverse(); 
+            return path; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public List<ivec2> FindPathTo( ivec2 start, Func<ivec2, int, bool> check, Func<ivec2,int,int> h )
+        {
+            IntCanvas visited = new IntCanvas(); 
+            visited.DefaultValue = int.MaxValue; 
+            visited.Reserve(MinSet, MaxSet); 
+
+            PriorityQueue<ivec3, int> toVisit = new PriorityQueue<ivec3, int>(); 
+            toVisit.Enqueue( new ivec3(start, 1), 1 ); 
+
+            while (toVisit.Count > 0) {
+                ivec3 tile = toVisit.Dequeue();  
+                ivec2 pos = tile.xy; 
+
+                // already visited this tile
+                if (visited.GetValue(pos) != int.MaxValue) {
+                    continue; 
+                }
+
+                if (check(pos, GetValue(pos))) {
+                    // found our destination, fall back to the origin
+                    return ComputePath( pos, visited ); 
+                }
+
+                // mark this as visited, and continue the algorithm
+                visited.SetValue(pos, tile.z); // set the weight at this tile (we can eventually just "fall down the hill" to our destination
+                EnqueueDir( toVisit, visited, tile.z, pos + ivec2.RIGHT, h ); 
+                EnqueueDir( toVisit, visited, tile.z, pos + ivec2.LEFT, h ); 
+                EnqueueDir( toVisit, visited, tile.z, pos + ivec2.UP, h ); 
+                EnqueueDir( toVisit, visited, tile.z, pos + ivec2.DOWN, h ); 
+            }
+
+            return new List<ivec2>(); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public List<ivec2> FindPathTo( ivec2 start, ivec2 end, Func<ivec2,int,int> h )
+        {
+            return FindPathTo( start, bool(ivec2 pos, int val) => pos == end, h ); 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public bool HasNeighbor( ivec2 pos, int val )
+        {
+            ivec2[] dirs = { ivec2.RIGHT, ivec2.LEFT, ivec2.UP, ivec2.DOWN }; 
+            for (int i = 0; i < 4; ++i) {
+                 if (GetValue(pos + dirs[i]) == val) {
+                    return true; 
+                }
+            }
+
+            return false; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public int Automata( Func<ivec2, int, int> rule )
+        {
+            int tilesChanged = 0; 
+            IntCanvas copy = new IntCanvas(this); 
+
+            ivec2 size = MaxSet - MinSet; 
+            for (int y = 0; y <= size.y; ++y) {
+                for (int x = 0; x <= size.x; ++x) {
+                    ivec2 pos = MinSet + new ivec2(x, y); 
+                    int oldValue = GetValue(pos); 
+                    int newValue = rule(pos, oldValue); 
+
+                    if (newValue != oldValue) {
+                        copy.SetValue(pos, newValue); 
+                        ++tilesChanged; 
+                    }
+                }
+            }
+
+            copy.Data.CopyTo(Data, 0); 
+            return tilesChanged; 
         }
     }
 }
