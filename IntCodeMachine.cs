@@ -183,6 +183,18 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public void SetTextInput( string txt, bool addNewline = true )
+        {
+            foreach (char c in txt) {
+                EnqueueInput(c); 
+            }
+
+            if (addNewline) {
+                EnqueueInput('\n'); 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void EnqueueOutput( Int64 val )
         {
             Outputs.Enqueue( val ); 
@@ -206,6 +218,29 @@ namespace AoC2021
             } else {
                 return defValue; 
             }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public string GetTextOuput()
+        {
+            if (!HasOutput()) {
+                return String.Empty; 
+            }
+
+            StringBuilder sb = new StringBuilder(); 
+            
+            char prevc = '\0'; 
+            while (HasOutput()) {
+                char c = (char) TryDequeueOutput(0); 
+                sb.Append(c); 
+
+                if ((prevc == '\n') && (c == '\n')) {
+                    break; 
+                }
+                prevc = c; 
+            }
+
+            return sb.ToString();
         }
 
         //----------------------------------------------------------------------------------------------
@@ -274,7 +309,7 @@ namespace AoC2021
                 IntCode[addr] = val; 
             } else {
                 Int64 memAddr = addr - IntCode.Length; 
-                if (memAddr > Memory.Length) {
+                if (memAddr >= Memory.Length) {
                     GrowMemoryToFit(memAddr); 
                 }
 

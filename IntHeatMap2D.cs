@@ -55,6 +55,20 @@ namespace AoC2021
         public void Init( ivec2 size, int defValue, int borderValue = -1 ) => Init( size.x, size.y, defValue, borderValue ); 
 
         //----------------------------------------------------------------------------------------------
+        public void InitFromString( string str, int borderValue = -1 )
+        {
+            str = str.Trim(); 
+            String[] lines = str.Split('\n'); 
+            Init( lines[0].Length, lines.Length, 0, borderValue ); 
+
+            for (int y = 0; y < lines.Length; ++y) {
+                for (int x = 0; x < lines[0].Length; ++x) {
+                    Set(x, y, lines[y][x]); // if this asserts, the string wasn't square
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
         public void Resize( int width, int height, bool keep = false )
         {
             int[] newData = new int[width * height]; 
@@ -243,6 +257,31 @@ namespace AoC2021
                     yield return (p, val); 
                 }
             }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public IEnumerable<ivec2> FindLocations( Func<ivec2, bool> predicate )
+        {
+            ivec2 pos; 
+            for (pos.y = 0; pos.y < Height; ++pos.y) {
+                for (pos.x = 0; pos.x < Width; ++pos.x) {
+                    if (predicate(pos)) {
+                        yield return pos; 
+                    }
+                }
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public ivec2? FindLocation( Func<ivec2, int, bool> search )
+        {
+            foreach ((ivec2 pos, int val) in this) {
+                if (search(pos, val)) {
+                    return pos; 
+                }
+            }
+
+            return null; 
         }
 
         //----------------------------------------------------------------------------------------------
