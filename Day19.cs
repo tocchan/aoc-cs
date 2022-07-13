@@ -105,13 +105,20 @@ namespace AoC2021
                 }
                 --x; 
 
-                // okay, see if we're wide enough
+                // really just need to check if the bottom left point is in the region... 
                 int left = x - targetSize + 1; 
+                int bottom = y + targetSize - 1; 
+                if (IsInTractor(left, bottom)) {
+                    break; 
+                }
+
+                /*
                 if (IsWideEnough(left, y, targetSize)) {
                     if (IsTallEnough(left, y, targetSize) && IsTallEnough(x, y, targetSize)) {
                         break; 
                     }
                 }
+                */
 
                 ++y; 
             }
