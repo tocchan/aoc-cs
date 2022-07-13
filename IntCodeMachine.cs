@@ -143,6 +143,15 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public void EnqueueInputs(params Int64[] vals)
+        { 
+            foreach (Int64 v in vals) {
+                EnqueueInput( v ); 
+            }
+        }
+       
+
+        //----------------------------------------------------------------------------------------------
         public bool DequeueInput( out Int64 val )
         {
             // callback method
