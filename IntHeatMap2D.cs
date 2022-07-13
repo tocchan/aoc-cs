@@ -59,6 +59,10 @@ namespace AoC2021
         {
             str = str.Trim(); 
             String[] lines = str.Split('\n'); 
+            for (int i = 0; i < lines.Length; ++i) {
+                lines[i] = lines[i].Trim(); 
+            }
+
             Init( lines[0].Length, lines.Length, 0, borderValue ); 
 
             for (int y = 0; y < lines.Length; ++y) {
@@ -336,6 +340,91 @@ namespace AoC2021
             }
 
             Data = newData; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public IntHeatMap2D FloodFill( ivec2 start, Func<int, int> costFunc )
+        {
+            IntHeatMap2D fill = new IntHeatMap2D( GetSize(), -1, -1 ); 
+
+            fill.Set( start, 0 ); 
+
+            PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>(); 
+            
+            ivec2[] dirs =
+            {
+                ivec2.LEFT, 
+                ivec2.RIGHT, 
+                ivec2.UP,
+                ivec2.DOWN, 
+            };
+
+            points.Enqueue( start, 0 ); 
+            while (points.Count > 0) {
+                ivec2 point = points.Dequeue(); 
+                int currentCost = fill.Get(point); 
+
+                foreach( ivec2 dir in dirs ) {
+                    ivec2 next = point + dir; 
+                    int type = Get(next); 
+                    int cost = costFunc(type); 
+                    if (cost >= 1) {
+                        int totalCost = cost + currentCost; 
+                        int curCost = fill.Get(next); 
+                        if ((curCost < 0) || (totalCost < curCost)) {
+                            fill.Set(next, totalCost); 
+                            points.Enqueue( next, totalCost ); 
+                        }
+                    }
+                }
+            }
+
+            return fill; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        public ivec2 GetLowestNeighbor(ivec2 p)
+        {
+            ivec2[] dirs =
+            {
+                ivec2.LEFT, 
+                ivec2.RIGHT, 
+                ivec2.UP,
+                ivec2.DOWN, 
+            };
+
+            ivec2 lowest = p; 
+            int lowestVal = Get(p); 
+
+            for (int i = 0; i < dirs.Length; ++i) {
+                ivec2 newPos = dirs[i] + p; 
+                int v = Get(newPos); 
+                if ((v >= 0) && (v < lowestVal)) {
+                    lowestVal = v; 
+                    lowest = newPos; 
+                }
+            }
+
+            return lowest; 
+        }
+
+        //----------------------------------------------------------------------------------------------
+        // On a flood fill map, will "fall down hill" from dst to the src point
+        public List<ivec2> GetSlopePath( ivec2 dst )
+        {
+            List<ivec2> path = new List<ivec2>(); 
+            if (Get(dst) < 0) {
+                return path; 
+            }
+
+            path.Add(dst); 
+            while (Get(dst) > 0) {
+                dst = GetLowestNeighbor(dst); 
+                path.Add(dst); 
+            }
+
+            path.Reverse();
+            return path; 
         }
 
         //----------------------------------------------------------------------------------------------

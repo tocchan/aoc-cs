@@ -34,6 +34,18 @@ namespace AoC2021
         }
 
         //----------------------------------------------------------------------------------------------
+        public static string ReadFileToString( string filename )
+        {
+            try {
+                return File.ReadAllText( filename ); 
+
+            } catch (Exception e) {
+                Console.WriteLine( "File read failed: " + e.ToString() ); 
+                return String.Empty; 
+            }
+        }
+
+        //----------------------------------------------------------------------------------------------
         public static Int64 BinaryStringToInt( string s )
         {
             return Convert.ToInt64( s, 2 );
