@@ -10,34 +10,62 @@ namespace AoC2022
    internal class Day01 : Day
    {
       private string InputFile = "2022/inputs/01.txt";
-      private List<int> Values = new List<int>(); 
+      private List<List<int>> Elves = new List<List<int>>(); 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
       {
          List<string> lines = Util.ReadFileToLines(InputFile);
-         Values = lines.Select(int.Parse).ToList();
+
+         List<int>? curElf = null;
+         foreach (string line in lines) {
+            if (line.Trim().Length == 0) {
+               curElf = null; 
+            } else {
+               int calories = int.Parse(line); 
+               if (curElf == null) {
+                  curElf = new List<int>(); 
+                  Elves.Add(curElf); 
+               }
+               curElf.Add(calories); 
+            }
+         }
       }
 
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         int fuelSum = 0;
-         for (int i = 0; i < Values.Count; ++i) {
-            fuelSum += Values[i];
+         int maxIdx = 0; 
+         int maxCalories = Elves[0].Sum(); 
+
+         for (int i = 1; i < Elves.Count; ++i) {
+            int sum = Elves[i].Sum(); 
+            if (sum > maxCalories) {
+               maxCalories = sum; 
+               maxIdx = i; 
+            }
          }
-         return fuelSum.ToString();
+
+         return maxCalories.ToString(); 
       }
 
 
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         int fuelSum = 1;
-         for (int i = 0; i < Values.Count; ++i) {
-            fuelSum *= Values[i];
+         PriorityQueue<int,int> maxValues = new PriorityQueue<int,int>(); 
+
+         for (int i = 0; i < Elves.Count; ++i) {
+            int cal = Elves[i].Sum(); 
+            maxValues.Enqueue(cal, -cal); 
          }
-         return fuelSum.ToString();
+
+         int sum = 0; 
+         for (int i = 0; i < 3; ++i) {
+            sum += maxValues.Dequeue(); 
+         }
+
+         return sum.ToString(); 
       }
    }
 }
