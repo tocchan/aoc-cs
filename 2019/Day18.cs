@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AoC;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics; 
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
     //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
@@ -54,7 +55,7 @@ namespace AoC2021
     //----------------------------------------------------------------------------------------------
     internal class Day18 : Day
     {
-        private string InputFile = "inputs/18.txt"; 
+        private string InputFile = "2019/inputs/18.txt"; 
         private IntHeatMap2D OriginalMap = new IntHeatMap2D(); 
 
         //----------------------------------------------------------------------------------------------

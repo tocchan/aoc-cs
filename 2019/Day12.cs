@@ -1,15 +1,16 @@
-﻿using System;
+﻿using AoC;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics; 
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
     internal class Day12 : Day
  {
-        private string InputFile = "inputs/12.txt"; 
+        private string InputFile = "2019/inputs/12.txt"; 
         private ivec3[] Planets = new ivec3[0]; 
 
         //----------------------------------------------------------------------------------------------

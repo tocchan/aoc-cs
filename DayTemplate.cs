@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC
 {
     internal class DayTemplate : Day
     {
@@ -12,7 +12,7 @@ namespace AoC2021
         //----------------------------------------------------------------------------------------------
         public override void ParseInput()
         {
-            // string inputFile = "inputs/01.txt"; 
+            // string inputFile = "2019/inputs/01.txt"; 
             // List<string> lines = Util.ReadFileToLines(inputFile); 
         }
 

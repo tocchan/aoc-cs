@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AoC; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics; 
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
     using Inventory = Dictionary<string,(Int64,Int64)>; 
 
@@ -79,7 +80,7 @@ namespace AoC2021
     //----------------------------------------------------------------------------------------------
     internal class Day14 : Day
  {
-        private string InputFile = "inputs/14.txt"; 
+        private string InputFile = "2019/inputs/14.txt"; 
 
         //----------------------------------------------------------------------------------------------
         public override void ParseInput()

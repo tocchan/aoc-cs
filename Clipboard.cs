@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices; 
 
 // From https://github.com/SimonCropp/TextCopy
-namespace AoC2021
+namespace AoC
 {
     internal class Clipboard
     {

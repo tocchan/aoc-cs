@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "AoC2021": {
+    "AoC": {
       "commandName": "Project",
       "workingDirectory": "$(SolutionDir)"
     }

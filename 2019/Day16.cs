@@ -1,17 +1,18 @@
-﻿using System;
+﻿using AoC; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics; 
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
     //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
     internal class Day16 : Day
  {
-        private string InputFile = "inputs/16.txt"; 
+        private string InputFile = "2019/inputs/16.txt"; 
         private int[] InputSignal = new int[0]; 
 
         //----------------------------------------------------------------------------------------------

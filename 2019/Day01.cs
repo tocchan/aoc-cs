@@ -1,15 +1,16 @@
-﻿using System;
+﻿using AoC; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
     internal class Day01 : Day
     {
-        private string InputFileA = "inputs/01.txt"; 
-        private string InputFileB = "inputs/01.txt"; 
+        private string InputFileA = "2019/inputs/01.txt"; 
+        private string InputFileB = "2019/inputs/01.txt"; 
 
         //----------------------------------------------------------------------------------------------
         public override void ParseInput()

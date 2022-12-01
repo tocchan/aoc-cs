@@ -1,14 +1,15 @@
-﻿using System;
+﻿using AoC; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
     internal class Day10 : Day
  {
-        private string InputFile = "inputs/10.txt"; 
+        private string InputFile = "2019/inputs/10.txt"; 
         private List<vec2> Asteroids = new List<vec2>();
 
         private vec2 StationPosition = vec2.ZERO; 

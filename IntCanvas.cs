@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Text;
 
-namespace AoC2021
+namespace AoC
 {
     //----------------------------------------------------------------------------------------------
     // Doing this as a infinite sparse tiled grid would be awesome,

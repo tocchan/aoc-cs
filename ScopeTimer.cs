@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace AoC2021
+namespace AoC
 {
     internal class ScopeTimer : IDisposable
     {

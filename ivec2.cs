@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC
 {
     public struct ivec2
     {

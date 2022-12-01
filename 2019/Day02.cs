@@ -1,10 +1,11 @@
-﻿using System;
+﻿using AoC; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AoC2021
+namespace AoC2019
 {
    
 
@@ -12,7 +13,7 @@ namespace AoC2021
     //----------------------------------------------------------------------------------------------
     internal class Day02 : Day
     {
-        private string InputFile = "inputs/02.txt"; 
+        private string InputFile = "2019/inputs/02.txt"; 
 
         //----------------------------------------------------------------------------------------------
         // values
