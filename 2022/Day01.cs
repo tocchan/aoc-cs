@@ -23,8 +23,7 @@ namespace AoC2022
       public override string RunA()
       {
          int fuelSum = 0;
-         for (int i = 0; i < Values.Count; ++i)
-         {
+         for (int i = 0; i < Values.Count; ++i) {
             fuelSum += Values[i];
          }
          return fuelSum.ToString();
@@ -34,10 +33,9 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         int fuelSum = 0;
-         for (int i = 0; i < Values.Count; ++i)
-         {
-            fuelSum += Values[i];
+         int fuelSum = 1;
+         for (int i = 0; i < Values.Count; ++i) {
+            fuelSum *= Values[i];
          }
          return fuelSum.ToString();
       }
