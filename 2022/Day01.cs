@@ -17,18 +17,9 @@ namespace AoC2022
       {
          List<string> lines = Util.ReadFileToLines(InputFile);
 
-         List<int>? curElf = null;
-         foreach (string line in lines) {
-            if (line.Trim().Length == 0) {
-               curElf = null; 
-            } else {
-               int calories = int.Parse(line); 
-               if (curElf == null) {
-                  curElf = new List<int>(); 
-                  Elves.Add(curElf); 
-               }
-               curElf.Add(calories); 
-            }
+         foreach (List<string> group in lines.SplitAllWhen(x => (x.Length == 0))) {
+            List<int> elf = group.Select(int.Parse).ToList(); 
+            Elves.Add(elf); 
          }
       }
 
