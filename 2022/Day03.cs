@@ -21,12 +21,7 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public char GetCommon(string a, string b)
       {
-         foreach (char c in a) {
-            if (b.Contains(c)) {
-               return c; 
-            }
-         }
-         return (char)0; 
+         return a.Intersect(b).First();
       }
 
       //----------------------------------------------------------------------------------------------
@@ -58,12 +53,7 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public char GetCommon(string a, string b, string c)
       {
-         foreach (char v in a) {
-            if (b.Contains(v) && c.Contains(v)) {
-               return v; 
-            }
-         }
-         return (char)0; 
+         return a.Intersect(b).Intersect(c).First(); 
       }
 
       //----------------------------------------------------------------------------------------------
