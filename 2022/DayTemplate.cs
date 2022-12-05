@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace AoC2022
 {
-   internal class Day05 : Day
+   internal class DayTemplate : Day
    {
-      private string InputFile = "2022/inputs/05.txt";
+      private string InputFile = "2022/inputs/01.txt";
       
       private List<string> Lines = new(); 
 
