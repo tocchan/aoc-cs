@@ -10,7 +10,7 @@ namespace AoC2022
    internal class Day02 : Day
    {
       private string InputFile = "2022/inputs/02.txt";
-      private List<string> Lines; 
+      private List<string> Lines = new();  
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
