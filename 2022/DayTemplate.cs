@@ -11,12 +11,11 @@ namespace AoC2022
    {
       private string InputFile = "2022/inputs/01.txt";
       
-      private List<string> Lines = new(); 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
       {
-         Lines = Util.ReadFileToLines(InputFile);
+         List<string> lines = Util.ReadFileToLines(InputFile);
       }
 
       //----------------------------------------------------------------------------------------------

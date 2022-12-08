@@ -75,24 +75,29 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public bool ContainsPoint( ivec2 pos )
+      {
+         return (pos >= ivec2.ZERO) && (pos < Size); 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public void Resize(int width, int height, bool keep = false)
       {
          int[] newData = new int[width * height];
 
          if (keep && (Data != null)) {
-            int copyWidth = Math.Min(width, Width);
-            int copyHeight = Math.Min(height, Height);
+            int copyWidth = Math.Min(width, Size.x);
+            int copyHeight = Math.Min(height, Size.y);
             for (int y = 0; y < copyHeight; ++y) {
                for (int x = 0; x < copyWidth; ++x) {
-                  int srcIdx = y * Width + x;
-                  int dstIdx = y * width + x;
+                  int srcIdx = y * Size.x + x;
+                  int dstIdx = y * Size.y + x;
                   newData[dstIdx] = Data[srcIdx];
                }
             }
          }
 
-         Width = width;
-         Height = height;
+         Size = new ivec2(width, height); 
          Data = newData;
       }
 
@@ -165,14 +170,14 @@ namespace AoC
       //----------------------------------------------------------------------------------------------
       private int GetIndex(int x, int y)
       {
-         return y * Width + x;
+         return y * Size.x + x;
       }
       private int GetIndex(ivec2 p) => GetIndex(p.x, p.y);
 
       //----------------------------------------------------------------------------------------------
       public void Set(int x, int y, int value)
       {
-         if ((y >= 0) && (y < Height) && (x >= 0) && (x < Width)) {
+         if ((y >= 0) && (y < Size.y) && (x >= 0) && (x < Size.x)) {
             int idx = GetIndex(x, y);
             Data[idx] = value;
          }
@@ -204,7 +209,7 @@ namespace AoC
 
       public int Get(int x, int y)
       {
-         if ((y >= 0) && (y < Height) && (x >= 0) && (x < Width)) {
+         if ((y >= 0) && (y < Size.y) && (x >= 0) && (x < Size.x)) {
             int idx = GetIndex(x, y);
             return Data[idx];
          } else {
@@ -224,8 +229,8 @@ namespace AoC
       {
          ivec2 pos;
          int idx = 0;
-         for (pos.y = 0; pos.y < Height; ++pos.y) {
-            for (pos.x = 0; pos.x < Width; ++pos.x) {
+         for (pos.y = 0; pos.y < Size.y; ++pos.y) {
+            for (pos.x = 0; pos.x < Size.x; ++pos.x) {
                yield return (pos, Data[idx]);
                ++idx;
             }
@@ -251,8 +256,8 @@ namespace AoC
       public IEnumerable<ivec2> FindLocations(Func<ivec2, bool> predicate)
       {
          ivec2 pos;
-         for (pos.y = 0; pos.y < Height; ++pos.y) {
-            for (pos.x = 0; pos.x < Width; ++pos.x) {
+         for (pos.y = 0; pos.y < Size.y; ++pos.y) {
+            for (pos.x = 0; pos.x < Size.x; ++pos.x) {
                if (predicate(pos)) {
                   yield return pos;
                }
@@ -276,14 +281,14 @@ namespace AoC
       public ivec2 GetSize()
       {
          ivec2 ret;
-         ret.x = Width;
-         ret.y = Height;
+         ret.x = Size.x;
+         ret.y = Size.y;
          return ret;
       }
 
       //----------------------------------------------------------------------------------------------
-      public int GetWidth() => Width;
-      public int GetHeight() => Height;
+      public int GetWidth() => Size.x;
+      public int GetHeight() => Size.y;
 
       //----------------------------------------------------------------------------------------------
       // Operators
@@ -312,12 +317,12 @@ namespace AoC
       // Value changes apply at the very end.  
       public void CellStep(Func<ivec2, int, int> func)
       {
-         int[] newData = new int[Width * Height];
+         int[] newData = new int[Size.x * Size.y];
 
          int idx = 0;
          ivec2 p;
-         for (p.y = 0; p.y < Height; ++p.y) {
-            for (p.x = 0; p.x < Width; ++p.x) {
+         for (p.y = 0; p.y < Size.y; ++p.y) {
+            for (p.x = 0; p.x < Size.x; ++p.x) {
                newData[idx] = func(p, Data[idx]);
                ++idx;
             }
@@ -415,10 +420,10 @@ namespace AoC
       public List<ivec2> FindPathDijkstra(ivec2 start, ivec2 end)
       {
          PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
-         ivec2[] prevMap = new ivec2[Width * Height];
-         int[] costs = new int[Width * Height];
+         ivec2[] prevMap = new ivec2[Size.x * Size.y];
+         int[] costs = new int[Size.x * Size.y];
 
-         for (int i = 0; i < Width * Height; ++i) {
+         for (int i = 0; i < Size.x * Size.y; ++i) {
             costs[i] = int.MaxValue;
          }
 
@@ -544,9 +549,8 @@ namespace AoC
       public int GetBoundsValue() => BoundsValue;
 
       //----------------------------------------------------------------------------------------------
+      private ivec2 Size = ivec2.ZERO; 
       private int[] Data = new int[0];
-      private int Width = 0;
-      private int Height = 0;
       private int BoundsValue = int.MaxValue;
    }
 
