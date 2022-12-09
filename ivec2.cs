@@ -35,6 +35,7 @@ namespace AoC
          y = yv;
       }
 
+      public bool IsZero() => ((x == 0) && (y == 0)); 
       public int Sum() => x + y;
       public int Product() => x * y;
       public int MaxElement() => Math.Max(x, y); 
@@ -45,23 +46,28 @@ namespace AoC
       public ivec2 GetRotatedRight() => new ivec2(-y, x);
       public void RotateRight() => this = GetRotatedRight();
 
-
       public int Dot(ivec2 v) => x * v.x + y * v.y;
       public int GetLengthSquared() => x * x + y * y;
       public float GetLength() => MathF.Sqrt((float)GetLengthSquared());
 
       public int GetManhattanDistance() => Abs(this).Sum();
 
+      public ivec2 GetBestDirectionTo(ivec2 p)
+      {
+         ivec2 diff = p - this;  
+         if (diff.IsZero()) { 
+            return ivec2.ZERO; 
+         } else {
+            ivec2 dir = diff / ivec2.Abs(diff).MaxElement(); 
+            return ivec2.Sign(dir); 
+         }
+      }
+
       // get a point in the 8 cells around me closest to p
       public ivec2 GetNearestNeighbor(ivec2 p)
       {
-         if (this != p) { 
-            ivec2 diff = this - p; 
-            ivec2 dir = diff / ivec2.Abs(diff).MaxElement(); 
-            return this - ivec2.Sign(dir); 
-         } else { 
-            return p; 
-         }
+         ivec2 dir = GetBestDirectionTo(p); 
+         return this + dir; 
       }
 
       public int this[int i]
