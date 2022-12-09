@@ -55,14 +55,13 @@ namespace AoC
       // get a point in the 8 cells around me closest to p
       public ivec2 GetNearestNeighbor(ivec2 p)
       {
-         ivec2 diff = this - p; 
-         ivec2 adiff = ivec2.Abs(diff); 
-         if (adiff.MaxElement() > 1) {
-            diff /= adiff.MaxElement(); 
-            return this - ivec2.Sign(diff); 
+         if (this != p) { 
+            ivec2 diff = this - p; 
+            ivec2 dir = diff / ivec2.Abs(diff).MaxElement(); 
+            return this - ivec2.Sign(dir); 
+         } else { 
+            return p; 
          }
-
-         return p; 
       }
 
       public int this[int i]
