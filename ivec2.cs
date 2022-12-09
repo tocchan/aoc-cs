@@ -37,6 +37,7 @@ namespace AoC
 
       public int Sum() => x + y;
       public int Product() => x * y;
+      public int MaxElement() => Math.Max(x, y); 
 
       public ivec2 GetRotatedLeft() => new ivec2(y, -x);
       public void RotateLeft() => this = GetRotatedLeft();

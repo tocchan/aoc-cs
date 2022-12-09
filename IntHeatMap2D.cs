@@ -340,20 +340,12 @@ namespace AoC
 
          PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
 
-         ivec2[] dirs =
-         {
-                ivec2.LEFT,
-                ivec2.RIGHT,
-                ivec2.UP,
-                ivec2.DOWN,
-            };
-
          points.Enqueue(start, 0);
          while (points.Count > 0) {
             ivec2 point = points.Dequeue();
             int currentCost = fill.Get(point);
 
-            foreach (ivec2 dir in dirs) {
+            foreach (ivec2 dir in ivec2.DIRECTIONS) {
                ivec2 next = point + dir;
                int type = Get(next);
                int cost = costFunc(type);
@@ -374,19 +366,11 @@ namespace AoC
       //----------------------------------------------------------------------------------------------
       public ivec2 GetLowestNeighbor(ivec2 p)
       {
-         ivec2[] dirs =
-         {
-                ivec2.LEFT,
-                ivec2.RIGHT,
-                ivec2.UP,
-                ivec2.DOWN,
-            };
-
          ivec2 lowest = p;
          int lowestVal = Get(p);
 
-         for (int i = 0; i < dirs.Length; ++i) {
-            ivec2 newPos = dirs[i] + p;
+         foreach (ivec2 dir in ivec2.DIRECTIONS) {
+            ivec2 newPos = dir + p;
             int v = Get(newPos);
             if ((v >= 0) && (v < lowestVal)) {
                lowestVal = v;
