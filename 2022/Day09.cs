@@ -42,19 +42,7 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       private ivec2 Follow(ivec2 head, ivec2 tail)
       {
-         ivec2 diff = head - tail; 
-         ivec2 adiff = ivec2.Abs(diff); 
-         if (adiff.MaxElement() > 1) {
-            if (adiff.x > adiff.y) {
-               return new ivec2(head.x - Math.Sign(diff.x), head.y);
-            } else if (adiff.y > adiff.x) { 
-               return new ivec2(head.x, head.y - Math.Sign(diff.y));
-            } else {
-               return head - ivec2.Sign(diff); 
-            }
-         }
-
-         return tail; 
+         return head.GetNearestNeighbor(tail); 
       }
 
       //----------------------------------------------------------------------------------------------

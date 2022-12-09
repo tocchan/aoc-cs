@@ -52,6 +52,19 @@ namespace AoC
 
       public int GetManhattanDistance() => Abs(this).Sum();
 
+      // get a point in the 8 cells around me closest to p
+      public ivec2 GetNearestNeighbor(ivec2 p)
+      {
+         ivec2 diff = this - p; 
+         ivec2 adiff = ivec2.Abs(diff); 
+         if (adiff.MaxElement() > 1) {
+            diff /= adiff.MaxElement(); 
+            return this - ivec2.Sign(diff); 
+         }
+
+         return p; 
+      }
+
       public int this[int i]
       {
          get { return (i == 0) ? x : y; }
