@@ -16,7 +16,7 @@ namespace AoC2022
    internal class Op
    {
       public int Delay = 1; 
-      public Action<Context>? Work;
+      public int Value = 0; 
    }
 
    internal class Day10 : Day
@@ -31,21 +31,12 @@ namespace AoC2022
          List<string> lines = Util.ReadFileToLines(InputFile);
          foreach (string line in lines) {
             string[] ops = line.Split(' '); 
+            Op op = new Op(); 
             if (ops[0] == "addx") {
-               Op op = new Op(); 
                op.Delay = 2; 
-               int v = int.Parse(ops[1]); 
-               op.Work = (Context c) => c.X += v;
-
-               Ops.Add(op); 
-            } else {
-               Op op = new Op(); 
-               op.Delay = 1; 
-               op.Work = (Context c) => { }; 
-
-               Ops.Add(op); 
+               op.Value = int.Parse(ops[1]); 
             }
-
+            Ops.Add(op); 
          }
       }
 
@@ -65,8 +56,7 @@ namespace AoC2022
             }
 
             c.Cycle = newCycle; 
-
-            op.Work!(c); 
+            c.X += op.Value; 
          }
 
          return value.ToString(); 
@@ -85,25 +75,17 @@ namespace AoC2022
 
          foreach (Op op in Ops) {
             int newCycle = ctx.Cycle + op.Delay; 
-
-            // c.X (one less or one greater is the sprite)
-            // cycle is the X
             int minX = ctx.X - 1; 
             int maxX = ctx.X + 1; 
 
             for (int c = ctx.Cycle; c < newCycle; ++c) {
                int x = c % 40;
                int y = c / 40; 
-
-               if ((x >= minX) && (x <= maxX)) {
-                  canvas.SetValue( new ivec2(x, y), 1 ); 
-               } else {
-                  canvas.SetValue( new ivec2(x, y), 0 ); 
-               }
+               int v = ((x >= minX) && (x <= maxX)) ? 1 : 0; 
+               canvas.SetValue( new ivec2(x, y), v ); 
             }
             ctx.Cycle = newCycle; 
-
-            op.Work!(ctx); 
+            ctx.X += op.Value; 
          }
 
          return "\n" + canvas.ToString(" █"); 
