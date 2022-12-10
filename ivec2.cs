@@ -49,7 +49,7 @@ namespace AoC
       public int Dot(ivec2 v) => x * v.x + y * v.y;
       public int GetLengthSquared() => x * x + y * y;
       public float GetLength() => MathF.Sqrt((float)GetLengthSquared());
-
+      
       public int GetManhattanDistance() => Abs(this).Sum();
 
       public ivec2 GetBestDirectionTo(ivec2 p)
