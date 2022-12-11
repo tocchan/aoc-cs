@@ -121,7 +121,7 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         ParseInput(); // result innput; 
+         ParseInput(); // reset inputs
 
          foreach (Monkey m in Monkeys) {
             LCW = Util.LCM(LCW, m.Divisor); 
