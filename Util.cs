@@ -259,5 +259,12 @@ namespace AoC
 
          return Math.Max(num, den);
       }
+
+      //----------------------------------------------------------------------------------------------
+      public static Int64 LCM(Int64 a, Int64 b)
+      {
+         Int64 gcd = GCD(a, b); 
+         return (a / gcd) * b; 
+      }
    }
 }
