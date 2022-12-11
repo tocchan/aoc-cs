@@ -67,8 +67,7 @@ namespace AoC2022
       {
          IntCanvas canvas = new IntCanvas(); 
          ivec2 size = new ivec2(40, 6); 
-         canvas.SetValue(ivec2.ZERO, 0); 
-         canvas.SetValue(size - ivec2.ONE, 0); 
+         canvas.SetSize(size); 
 
          Context ctx = new(); 
          ctx.Cycle = 0; 
