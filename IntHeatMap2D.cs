@@ -150,7 +150,7 @@ namespace AoC
 
 
       //----------------------------------------------------------------------------------------------
-      public void SetFromTightBlock(List<string> lines, int boundsValue = int.MaxValue)
+      public void SetFromTightBlock(List<string> lines, int boundsValue = int.MaxValue, int minValue = '0')
       {
          BoundsValue = boundsValue;
          int width = lines[0].Length;
@@ -161,7 +161,7 @@ namespace AoC
          int idx = 0;
          foreach (string line in lines) {
             foreach (char c in line) {
-               Data[idx] = c - '0';
+               Data[idx] = c - minValue;
                ++idx;
             }
          }
@@ -400,8 +400,56 @@ namespace AoC
          return path;
       }
 
+      
       //----------------------------------------------------------------------------------------------
-      public List<ivec2> FindPathDijkstra(ivec2 start, ivec2 end)
+      // returns a heat map with the cost it takes to get to the end
+      public IntHeatMap2D DijkstraFlood(ivec2 end, Func<ivec2,ivec2,int> cost) 
+      {
+         PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
+         ivec2[] prevMap = new ivec2[Size.x * Size.y];
+         IntHeatMap2D costs = new IntHeatMap2D(Size);
+
+         for (int i = 0; i < Size.x * Size.y; ++i) {
+            costs[i] = int.MaxValue;
+         }
+
+         prevMap[GetIndex(end)] = end;
+         costs[GetIndex(end)] = 0;
+
+         // Start the algorithm - from the end, so I don't have to reverse it when I finish
+         points.Enqueue(end, Get(end));
+         while (points.Count > 0) {
+            ivec2 src = points.Dequeue();
+
+            int srcIdx = GetIndex(src);
+            int srcCost = costs[srcIdx];
+            foreach (ivec2 dir in ivec2.DIRECTIONS) {
+               ivec2 dst = src + dir;
+               if (!ContainsPoint(dst)) {
+                  continue; 
+               }
+
+               int dstIdx = GetIndex(dst);
+               if (costs[dstIdx] != int.MaxValue) {
+                  continue; // already visited this
+               }
+
+               int dstCost = cost(dst, src); 
+               if ((dstCost != BoundsValue) && (costs[dstIdx] == int.MaxValue)) {
+                  dstCost += srcCost;
+                  costs[dstIdx] = dstCost;
+                  prevMap[dstIdx] = src;
+
+                  points.Enqueue(dst, dstCost);
+               }
+            }
+         }
+
+         return costs;         
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public List<ivec2> FindPathDijkstra(ivec2 start, ivec2 end, Func<ivec2,ivec2,int> cost) 
       {
          PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
          ivec2[] prevMap = new ivec2[Size.x * Size.y];
@@ -416,17 +464,19 @@ namespace AoC
 
          ivec2[] dirs =
          {
-                ivec2.LEFT,
-                ivec2.RIGHT,
-                ivec2.UP,
-                ivec2.DOWN,
-            };
+            ivec2.LEFT,
+            ivec2.RIGHT,
+            ivec2.UP,
+            ivec2.DOWN,
+         };
 
          // Start the algorithm - from the end, so I don't have to reverse it when I finish
+         bool foundPath = false; 
          points.Enqueue(end, Get(end));
          while (points.Count > 0) {
             ivec2 src = points.Dequeue();
             if (src == start) {
+               foundPath = true; 
                break;
             }
 
@@ -434,8 +484,16 @@ namespace AoC
             int srcCost = costs[srcIdx];
             foreach (ivec2 dir in dirs) {
                ivec2 dst = src + dir;
+               if (!ContainsPoint(dst)) {
+                  continue; 
+               }
+
                int dstIdx = GetIndex(dst);
-               int dstCost = Get(dst);
+               if (costs[dstIdx] != int.MaxValue) {
+                  continue; // already visited this
+               }
+
+               int dstCost = cost(dst, src); 
                if ((dstCost != BoundsValue) && (costs[dstIdx] == int.MaxValue)) {
                   dstCost += srcCost;
                   costs[dstIdx] = dstCost;
@@ -448,6 +506,19 @@ namespace AoC
 
          // okay, have my path, follow it to the start
          List<ivec2> path = new List<ivec2>();
+         if (!foundPath) {
+            /*
+            int tidx = 0; 
+            for (int y = 0; y < GetHeight(); ++y) {
+               for (int x = 0; x < GetWidth(); ++x) {
+                  Console.Write(costs[tidx].ToString("   ") + ","); 
+                  ++tidx; 
+               }
+               Console.Write('\n'); 
+            }
+            */
+            return path;
+         }
 
          ivec2 pos = start;
          path.Add(pos);
@@ -459,6 +530,13 @@ namespace AoC
 
          return path;
       }
+
+      //----------------------------------------------------------------------------------------------
+      public List<ivec2> FindPathDijkstra(ivec2 start, ivec2 end)
+      {
+         return FindPathDijkstra(start, end, (ivec2 s, ivec2 e) => Get(e)); 
+      }
+
 
       //----------------------------------------------------------------------------------------------
       public int SumValuesAlong(List<ivec2> path)
