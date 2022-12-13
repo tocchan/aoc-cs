@@ -25,6 +25,24 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      // sets all elements in a list to a value
+      public static void SetAll<T>(this List<T> list, T val)
+      {
+         for (int i = 0; i < list.Count; ++i) {
+            list[i] = val; 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
+      // sets all elements in a list to a value
+      public static void SetAll<T>(this T[] list, T val)
+      {
+         for (int i = 0; i < list.Length; ++i) {
+            list[i] = val; 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       // Splits the list at first element that passes the predicate. 
       // return value is all items before the match, 
       // and the list will contain all elements after the match.  The match is removed.

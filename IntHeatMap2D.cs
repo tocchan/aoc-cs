@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 
 namespace AoC
 {
@@ -168,11 +169,10 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
-      private int GetIndex(int x, int y)
-      {
-         return y * Size.x + x;
-      }
-      private int GetIndex(ivec2 p) => GetIndex(p.x, p.y);
+      public int GetIndex(int x, int y) => y * Size.x + x;
+      public int GetIndex(ivec2 p) => GetIndex(p.x, p.y);
+
+      public ivec2 FromIndex(int idx) => new ivec2( idx / Size.y, idx % Size.y ); 
 
       //----------------------------------------------------------------------------------------------
       public void Set(int x, int y, int value)
@@ -403,25 +403,31 @@ namespace AoC
       
       //----------------------------------------------------------------------------------------------
       // returns a heat map with the cost it takes to get to the end
-      public IntHeatMap2D DijkstraFlood(ivec2 end, Func<ivec2,ivec2,int> cost) 
+      // cost function is the cost it takes to go from one tile to another (going _toward_ the 
+      // end point provided).  Returning -1 means nont possible.
+      public IntHeatMap2D DijkstraFlood(ivec2 end, Func<ivec2,ivec2,int> cost, out int[] paths) 
       {
          PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
-         ivec2[] prevMap = new ivec2[Size.x * Size.y];
-         IntHeatMap2D costs = new IntHeatMap2D(Size);
+         BitArray visited = new BitArray(Size.x * Size.y); 
+         IntHeatMap2D costs = new IntHeatMap2D(Size, int.MaxValue, int.MaxValue);
+         paths = new int[Size.x * Size.y]; 
+         paths.SetAll(-1); 
 
-         for (int i = 0; i < Size.x * Size.y; ++i) {
-            costs[i] = int.MaxValue;
-         }
+         int srcIdx = GetIndex(end); 
+         costs[srcIdx] = 0;
 
-         prevMap[GetIndex(end)] = end;
-         costs[GetIndex(end)] = 0;
-
-         // Start the algorithm - from the end, so I don't have to reverse it when I finish
+         // start algorithm from the end
          points.Enqueue(end, Get(end));
          while (points.Count > 0) {
             ivec2 src = points.Dequeue();
+            srcIdx = GetIndex(src); 
 
-            int srcIdx = GetIndex(src);
+            // only count first person to get here; 
+            if (visited[srcIdx]) {
+               continue; // already visited, leave
+            }
+            visited[srcIdx] = true; 
+
             int srcCost = costs[srcIdx];
             foreach (ivec2 dir in ivec2.DIRECTIONS) {
                ivec2 dst = src + dir;
@@ -430,17 +436,12 @@ namespace AoC
                }
 
                int dstIdx = GetIndex(dst);
-               if (costs[dstIdx] != int.MaxValue) {
-                  continue; // already visited this
-               }
-
                int dstCost = cost(dst, src); 
-               if ((dstCost != BoundsValue) && (costs[dstIdx] == int.MaxValue)) {
-                  dstCost += srcCost;
-                  costs[dstIdx] = dstCost;
-                  prevMap[dstIdx] = src;
-
-                  points.Enqueue(dst, dstCost);
+               int newCost = dstCost + srcCost;
+               if ((dstCost >= 0) && (newCost < costs[dstIdx])) {
+                  costs[dstIdx] = newCost;
+                  paths[dstIdx] = srcIdx; 
+                  points.Enqueue(dst, newCost);
                }
             }
          }
@@ -449,86 +450,33 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public IntHeatMap2D DijkstraFlood(ivec2 end, Func<ivec2,ivec2,int> cost)
+      {
+         int[] unused; 
+         return DijkstraFlood(end, cost, out unused); 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public List<ivec2> FindPathDijkstra(ivec2 start, ivec2 end, Func<ivec2,ivec2,int> cost) 
       {
-         PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
-         ivec2[] prevMap = new ivec2[Size.x * Size.y];
-         int[] costs = new int[Size.x * Size.y];
+         int[] paths; 
+         DijkstraFlood(end, cost, out paths); 
 
-         for (int i = 0; i < Size.x * Size.y; ++i) {
-            costs[i] = int.MaxValue;
-         }
-
-         prevMap[GetIndex(end)] = end;
-         costs[GetIndex(end)] = 0;
-
-         ivec2[] dirs =
-         {
-            ivec2.LEFT,
-            ivec2.RIGHT,
-            ivec2.UP,
-            ivec2.DOWN,
-         };
-
-         // Start the algorithm - from the end, so I don't have to reverse it when I finish
-         bool foundPath = false; 
-         points.Enqueue(end, Get(end));
-         while (points.Count > 0) {
-            ivec2 src = points.Dequeue();
-            if (src == start) {
-               foundPath = true; 
-               break;
-            }
-
-            int srcIdx = GetIndex(src);
-            int srcCost = costs[srcIdx];
-            foreach (ivec2 dir in dirs) {
-               ivec2 dst = src + dir;
-               if (!ContainsPoint(dst)) {
-                  continue; 
-               }
-
-               int dstIdx = GetIndex(dst);
-               if (costs[dstIdx] != int.MaxValue) {
-                  continue; // already visited this
-               }
-
-               int dstCost = cost(dst, src); 
-               if ((dstCost != BoundsValue) && (costs[dstIdx] == int.MaxValue)) {
-                  dstCost += srcCost;
-                  costs[dstIdx] = dstCost;
-                  prevMap[dstIdx] = src;
-
-                  points.Enqueue(dst, dstCost);
-               }
-            }
-         }
-
-         // okay, have my path, follow it to the start
          List<ivec2> path = new List<ivec2>();
-         if (!foundPath) {
-            /*
-            int tidx = 0; 
-            for (int y = 0; y < GetHeight(); ++y) {
-               for (int x = 0; x < GetWidth(); ++x) {
-                  Console.Write(costs[tidx].ToString("   ") + ","); 
-                  ++tidx; 
-               }
-               Console.Write('\n'); 
-            }
-            */
-            return path;
+         int idx = GetIndex(start); 
+         if (paths[idx] < 0) {
+            return path; 
          }
 
-         ivec2 pos = start;
-         path.Add(pos);
+         path.Add(start); 
+         int endIdx = GetIndex(end); 
 
-         while (prevMap[GetIndex(pos)] != pos) {
-            pos = prevMap[GetIndex(pos)];
-            path.Add(pos);
+         while (idx != endIdx) {
+            idx = paths[idx]; 
+            path.Add(FromIndex(idx)); 
          }
-
-         return path;
+         
+         return path; 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -536,7 +484,6 @@ namespace AoC
       {
          return FindPathDijkstra(start, end, (ivec2 s, ivec2 e) => Get(e)); 
       }
-
 
       //----------------------------------------------------------------------------------------------
       public int SumValuesAlong(List<ivec2> path)
@@ -604,6 +551,42 @@ namespace AoC
          } else {
             return a.Equals(b);
          }
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public string ToString(int elemSize)
+      {
+         StringBuilder sb = new StringBuilder(); 
+         int width = GetWidth(); 
+         int last = width - 1; 
+         int boundsValue = GetBoundsValue(); 
+         string blank = string.Concat(Enumerable.Repeat("-", elemSize));
+
+         for (int y = 0; y < GetHeight(); ++y) {
+            for (int x = 0; x < width; ++x) {
+               int v = Get(x, y); 
+
+               if (v == boundsValue) {
+                  sb.Append(blank); 
+               } else {
+                  sb.Append(v.ToString().PadLeft(elemSize)); 
+               }
+
+               if (x != last) {
+                  sb.Append(','); 
+               }
+            }
+
+            sb.Append('\n'); 
+         }
+
+         return sb.ToString(); 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public override string ToString()
+      {
+         return ToString(3); 
       }
 
       //----------------------------------------------------------------------------------------------

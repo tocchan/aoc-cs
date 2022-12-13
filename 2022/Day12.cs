@@ -33,13 +33,14 @@ namespace AoC2022
          Map.Set( End, 'z' - 'a' ); 
       }
 
+      //----------------------------------------------------------------------------------------------
       private int PathCost(ivec2 s, ivec2 e)
       {
          int sv = Map.Get(s); 
          int ev = Map.Get(e); 
          int diff = ev - sv; 
          if (sv == Map.GetBoundsValue() || ev == Map.GetBoundsValue() || (diff > 1)) {
-            return Map.GetBoundsValue(); 
+            return -1; // negative means unpathable
          } else {
             return 1; 
          }
@@ -48,8 +49,9 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         IntHeatMap2D fill = Map.DijkstraFlood(End, PathCost); 
-         return fill.Get(Start).ToString(); 
+         // IntHeatMap2D fill = Map.DijkstraFlood(End, PathCost); 
+         List<ivec2> path = Map.FindPathDijkstra(Start, End, PathCost); 
+         return (path.Count - 1).ToString(); 
       }
 
       //----------------------------------------------------------------------------------------------
