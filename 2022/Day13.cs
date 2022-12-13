@@ -109,10 +109,9 @@ namespace AoC2022
             return Math.Sign(lh.Children.Count - rh.Children.Count); 
          }
 
-         /*
          if (lh.IsValue()) {
             if (rh.IsEmpty()) {
-               return -1; 
+               return 1; 
             } else {
                int c =  Compare(lh, rh.Children[0]); 
                if ((c == 0) && (rh.Children.Count > 1)) {
@@ -122,7 +121,7 @@ namespace AoC2022
             }
          } else {  // rh.IsValue()
             if (lh.IsEmpty()) {
-               return 1; 
+               return -1; 
             } else {
                int c = Compare(lh.Children[0], rh); 
                if ((c == 0) && (lh.Children.Count > 1)) {
@@ -131,8 +130,8 @@ namespace AoC2022
                return c; 
             }
          }
-         */
 
+         /*
          if (lh.IsValue()) {
             ListTree nlh = new ListTree(lh); 
             return Compare(nlh, rh); 
@@ -140,6 +139,7 @@ namespace AoC2022
             ListTree nrh = new ListTree(rh); 
             return Compare(lh, nrh); 
          }
+         */
       }
 
       public bool IsValue() => Value.HasValue; 
