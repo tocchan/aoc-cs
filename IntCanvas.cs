@@ -72,6 +72,9 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public ivec2 GetMaxSetPosition() => MaxSet; 
+
+      //----------------------------------------------------------------------------------------------
       public int SetValue(ivec2 pos, int val)
       {
          GrowToFit(pos);
@@ -84,6 +87,18 @@ namespace AoC
       }
 
       public int SetValue(int x, int y, int val) => SetValue(new ivec2(x, y), val);
+
+      //----------------------------------------------------------------------------------------------
+      public void DrawStraightLine(ivec2 p0, ivec2 p1, int val)
+      {
+         ivec2 dir = ivec2.Sign(p1 - p0); 
+         ivec2 p = p0; 
+         while (p != p1) {
+            SetValue(p, val); 
+            p += dir; 
+         }
+         SetValue(p1, val); 
+      }
 
       //----------------------------------------------------------------------------------------------
       private void GrowToFit(ivec2 min, ivec2 max)
