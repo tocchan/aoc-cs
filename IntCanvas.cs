@@ -72,6 +72,19 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public ivec2? GetOpenPosition(ivec2 p0, ivec2[] dirs, int openVal = 0)
+      {
+         foreach (ivec2 dir in dirs) {
+            ivec2 np = p0 + dir; 
+            if (GetValue(np) == openVal) {
+               return np; 
+            }
+         }
+
+         return null; 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public ivec2 GetMaxSetPosition() => MaxSet; 
 
       //----------------------------------------------------------------------------------------------

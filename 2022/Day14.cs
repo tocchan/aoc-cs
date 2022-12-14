@@ -12,6 +12,11 @@ namespace AoC2022
       private string InputFile = "2022/inputs/14.txt";
 
       List<ivec2[]> Paths = new(); 
+      ivec2[] Dirs = {
+         new ivec2(0, 1), 
+         new ivec2(-1, 1), 
+         new ivec2(1, 1)
+      }; 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
@@ -30,21 +35,15 @@ namespace AoC2022
             return false; 
          }
 
-         while (true) {
-            ivec2 pn = p + ivec2.DOWN; 
-            if (canvas.GetValue(pn) != 0) { 
-               pn = pn + ivec2.LEFT; 
-               if (canvas.GetValue(pn) != 0) {
-                  pn = pn + 2 * ivec2.RIGHT; 
-                  if (canvas.GetValue(pn) != 0) {
-                     break; 
-                  }
-               }
-            }
-            p = pn; 
-            if (p.y > canvas.GetMaxSetPosition().y) {
+         int maxValue = canvas.GetMaxSetPosition().y; 
+         ivec2? pn = canvas.GetOpenPosition(p, Dirs); 
+         while (pn.HasValue) {
+            p = pn.Value; 
+            if (p.y >= maxValue) {
                return false; 
             }
+
+            pn = canvas.GetOpenPosition(p, Dirs); 
          }
 
          canvas.SetValue(p, 1); 
@@ -55,7 +54,6 @@ namespace AoC2022
       public override string RunA()
       {
          IntCanvas canvas = new IntCanvas(); 
-         
          foreach (ivec2[] path in Paths) {
             for (int i = 0; i < path.Length - 1; ++i) { 
                ivec2 p0 = path[i]; 
@@ -80,23 +78,10 @@ namespace AoC2022
             return false; 
          }
 
-
-         while (true) {
-            ivec2 pn = p + ivec2.DOWN; 
-            if (pn.y >= floor) { 
-               break; 
-            }
-
-            if (canvas.GetValue(pn) != 0) { 
-               pn = pn + ivec2.LEFT; 
-               if (canvas.GetValue(pn) != 0) {
-                  pn = pn + 2 * ivec2.RIGHT; 
-                  if (canvas.GetValue(pn) != 0) {
-                     break; 
-                  }
-               }
-            }
-            p = pn; 
+         ivec2? pn = canvas.GetOpenPosition(p, Dirs); 
+         while (pn.HasValue && (pn.Value.y < floor)) {
+            p = pn.Value; 
+            pn = canvas.GetOpenPosition(p, Dirs); 
          }
 
          canvas.SetValue(p, 1); 
@@ -107,7 +92,6 @@ namespace AoC2022
       public override string RunB()
       {
          IntCanvas canvas = new IntCanvas(); 
-         
          foreach (ivec2[] path in Paths) {
             for (int i = 0; i < path.Length - 1; ++i) { 
                ivec2 p0 = path[i]; 
@@ -116,9 +100,8 @@ namespace AoC2022
             }
          }
 
-         int floor = canvas.GetMaxSetPosition().y + 2; 
-
          int count = 0; 
+         int floor = canvas.GetMaxSetPosition().y + 2; 
          ivec2 origin = new ivec2(500, 0); 
          while (DropSandB(canvas, origin, floor)) {
             ++count;
