@@ -55,11 +55,7 @@ namespace AoC2022
       {
          IntCanvas canvas = new IntCanvas(); 
          foreach (ivec2[] path in Paths) {
-            for (int i = 0; i < path.Length - 1; ++i) { 
-               ivec2 p0 = path[i]; 
-               ivec2 p1 = path[i + 1]; 
-               canvas.DrawStraightLine(p0, p1, 2); 
-            }
+            canvas.DrawStraightPath(path, 2); 
          }
 
          int count = 0; 
@@ -93,11 +89,7 @@ namespace AoC2022
       {
          IntCanvas canvas = new IntCanvas(); 
          foreach (ivec2[] path in Paths) {
-            for (int i = 0; i < path.Length - 1; ++i) { 
-               ivec2 p0 = path[i]; 
-               ivec2 p1 = path[i + 1]; 
-               canvas.DrawStraightLine(p0, p1, 2); 
-            }
+            canvas.DrawStraightPath(path, 2); 
          }
 
          int count = 0; 

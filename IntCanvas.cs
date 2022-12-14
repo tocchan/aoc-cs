@@ -114,6 +114,14 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public void DrawStraightPath(ivec2[] path, int val)
+      {
+         for (int i = 0; i < path.Length - 1; ++i) {
+            DrawStraightLine(path[i], path[i + 1], val); 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       private void GrowToFit(ivec2 min, ivec2 max)
       {
          ivec2 maxSize = Min + Size;
