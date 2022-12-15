@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +27,9 @@ namespace AoC
          Max = max; 
       }
 
+      public int Count => IsValid() ? (Max - Min) + 1 : 0; 
+
+
       //----------------------------------------------------------------------------------------------
       // Contracts from a string that looks like
       // > "1-5"
@@ -42,6 +46,8 @@ namespace AoC
          return Max >= Min; 
       }
 
+      public bool Contains( int v ) => ((v >= Min) && (v <= Max));
+
       //----------------------------------------------------------------------------------------------
       public bool Contains( IntRange other )
       {
@@ -57,7 +63,13 @@ namespace AoC
       //----------------------------------------------------------------------------------------------
       public IntRange GetIntersection( IntRange other )
       {
-         return new IntRange( Math.Min(Max, other.Max), Math.Max(Min, other.Min) ); 
+         return new IntRange( Math.Max(Min, other.Min), Math.Min(Max, other.Max) ); 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public IntRange GetUnion( IntRange other )
+      {
+         return new IntRange( Math.Min(Min, other.Min), Math.Max(Max, other.Max) ); 
       }
    }
 }
