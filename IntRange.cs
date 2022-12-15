@@ -21,6 +21,13 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public IntRange( IntRange copy )
+      {
+         Min = copy.Min; 
+         Max = copy.Max; 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public IntRange( int min, int max )
       {
          Min = min; 
@@ -38,6 +45,13 @@ namespace AoC
       {
          (int min, int max) = range.Split('-').Select(int.Parse).ToArray(); 
          return new IntRange( min, max ); 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public void Set( IntRange other )
+      {
+         Min = other.Min; 
+         Max = other.Max; 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -70,6 +84,11 @@ namespace AoC
       public IntRange GetUnion( IntRange other )
       {
          return new IntRange( Math.Min(Min, other.Min), Math.Max(Max, other.Max) ); 
+      }
+
+      public override string ToString()
+      {
+         return $"[{Min}~{Max}], Count = {Count}"; 
       }
    }
 }

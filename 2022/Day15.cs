@@ -8,56 +8,10 @@ using System.Threading.Tasks;
 
 namespace AoC2022
 {
-   internal class IntRangeList
-   {
-      public void Add(IntRange range)
-      {
-         List<IntRange> intersections = new(); 
-         IntRange finalRange = range; 
-         foreach (IntRange i in DisjointRanges.Where( other => other.Intersects(range) )) {
-            intersections.Add(i); 
-            finalRange = finalRange.GetUnion(i); 
-         }
+  
 
-         foreach (IntRange i in intersections) {
-            DisjointRanges.Remove(i); 
-         }
-
-         DisjointRanges.Add(finalRange); 
-         DisjointRanges = DisjointRanges.OrderBy( r => r.Min ).ToList(); 
-      }
-
-      public int GetCount()
-      {
-         int count = 0; 
-         foreach (IntRange r in DisjointRanges) {
-            count += r.Count; 
-         }
-         return count; 
-      }
-
-      public void SetLowerBound(int v)
-      {
-         while (DisjointRanges.Count > 0) {
-            IntRange r = DisjointRanges[0]; 
-            if (r.Max < v) {
-               DisjointRanges.RemoveAt(0); 
-            } else if (r.Contains(v)) {
-               r.Min = v;
-               return; 
-            } else if (r.Min >= v) {
-               return; // done; 
-            }
-         }
-      }
-
-      public int GetRangeCount() => DisjointRanges.Count; 
-      public IntRange GetRange(int idx) => DisjointRanges[idx]; 
-
-      // Disjoint list of ranges - sorted by mins
-      List<IntRange> DisjointRanges = new(); 
-   }
-
+   //----------------------------------------------------------------------------------------------
+   //----------------------------------------------------------------------------------------------
    internal class Day15 : Day
    {
       private string InputFile = "2022/inputs/15.txt";
@@ -82,9 +36,9 @@ namespace AoC2022
          }
       }
 
-      public IntRangeList ComputeSet(int row)
+      public IntSet ComputeSet(int row)
       {
-         IntRangeList ranges = new IntRangeList(); 
+         IntSet ranges = new IntSet(); 
          for (int i = 0; i < Sensors.Count; ++i) {
             ivec2 sensor = Sensors[i]; 
             ivec2 beacon = Closest[i]; 
@@ -106,8 +60,8 @@ namespace AoC2022
       public override string RunA()
       {
          // go through each beacon, figure how many of that beacon lie on my row.  Subtract a count of all unique beacons on that row
-         int row = 2000000; 
-         IntRangeList ranges = ComputeSet(row); 
+         int row = 974977; 
+         IntSet ranges = ComputeSet(row); 
          
          HashSet<ivec2> rowBeacons = new(); 
          for (int i = 0; i < Sensors.Count; ++i) {
@@ -128,7 +82,7 @@ namespace AoC2022
       public override string RunB()
       {
          for (int y = 0; y < 4000000; ++y) {
-            IntRangeList ranges = ComputeSet(y); 
+            IntSet ranges = ComputeSet(y); 
             ranges.SetLowerBound(0); 
             if (ranges.GetRangeCount() > 1) {
                Int64 x = ranges.GetRange(0).Max + 1; 
@@ -137,7 +91,6 @@ namespace AoC2022
                return freq.ToString(); 
             }
          }
-
          return ""; 
       }
    }
