@@ -16,6 +16,9 @@ namespace AoC2022
       int[] Moves = new int[0]; 
       IntMap[] Shapes = new IntMap[0]; 
 
+      //----------------------------------------------------------------------------------------------
+      // Game State
+      //----------------------------------------------------------------------------------------------
       internal class GameState
       {
          public IntCanvas Canvas = new(); 
@@ -28,6 +31,7 @@ namespace AoC2022
 
          public int MaxHeight = 0; 
 
+         //----------------------------------------------------------------------------------------------
          public void IncrementRockIndex()
          {
             ++RockIndex; 
@@ -36,6 +40,7 @@ namespace AoC2022
             }
          }
 
+         //----------------------------------------------------------------------------------------------
          public void IncrementMoveIndex()
          {
             ++MoveIndex;
@@ -44,6 +49,7 @@ namespace AoC2022
             }
          }
 
+         //----------------------------------------------------------------------------------------------
          private bool Collides( ivec2 pos, IntMap rock )
          {
             // hit a wall
@@ -59,6 +65,7 @@ namespace AoC2022
             return Canvas.CollidesWith(pos, rock); 
          }
 
+         //----------------------------------------------------------------------------------------------
          public void DropNext()
          {
             IntMap rock = Shapes[RockIndex]; 
@@ -86,10 +93,12 @@ namespace AoC2022
             MaxHeight = Math.Min(pos.y - 1, MaxHeight);  
          }
 
+         //----------------------------------------------------------------------------------------------
          public int Height => -MaxHeight; 
          public ivec2 MoveState => new ivec2(RockIndex, MoveIndex);
       }
 
+      //----------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
       {
@@ -123,10 +132,6 @@ namespace AoC2022
          ); 
       }
 
-      
-
-
-
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
@@ -155,6 +160,7 @@ namespace AoC2022
          Int64 totalRocks = 1000000000000; 
          Int64 totalHeight = 0; 
 
+         // drop - hope the pattern emerges in the first 10000 moves...
          for (int ri = 0; ri <= 10000; ++ri) {
             if (state.RockIndex == 0) {
                int moveIdx = state.MoveIndex; 
@@ -167,7 +173,6 @@ namespace AoC2022
                      totalHeight += state.Height; 
                      totalRocks = totalRocks - ri;
 
-                  
                      Int64 intervals = totalRocks / rInterval; 
                      totalHeight += intervals * hInterval; 
 
@@ -183,7 +188,7 @@ namespace AoC2022
             state.DropNext();
          }
 
-         // okay, we just need to close out
+         // okay, we just need to close out the remaining rocks
          int rem0 = state.Height; 
          for (Int64 i = 0; i < totalRocks; ++i) {
             state.DropNext(); 
