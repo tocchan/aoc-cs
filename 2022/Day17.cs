@@ -13,137 +13,184 @@ namespace AoC2022
    {
       private string InputFile = "2022/inputs/17.txt";
       
-      List<ivec2> Push = new(); 
+      int[] Moves = new int[0]; 
+      IntMap[] Shapes = new IntMap[0]; 
 
-      List<IntMap> Shapes = new(); 
-
-      //----------------------------------------------------------------------------------------------
-      public override void ParseInput()
+      internal class GameState
       {
-         List<string> lines = Util.ReadFileToLines(InputFile);
-         foreach (char c in lines[0]) {
-            Push.Add(c == '>' ? ivec2.RIGHT : ivec2.LEFT); 
-         }
+         public IntCanvas Canvas = new(); 
+         public int Width = 7; 
+         public int RockIndex = 0; 
+         public int MoveIndex = 0; 
 
-         // Add shapes
-         Shapes.Add( new IntMap(
-            "####"
-         )); 
-         Shapes.Add( new IntMap(
-            " # \n" +
-            "###\n" +
-            " # "
-         )); 
-         Shapes.Add( new IntMap(
-            "  #\n" +
-            "  #\n" +
-            "###"
-         )); 
-         Shapes.Add( new IntMap(
-            "#\n" +
-            "#\n" +
-            "#\n" +
-            "#"
-         )); 
-         Shapes.Add( new IntMap(
-            "##\n" + 
-            "##"
-         )); 
-      }
+         public IntMap[] Shapes = new IntMap[0]; 
+         public int[] Moves = new int[0]; 
 
-      private bool Collides( ivec2 pos, IntMap rock, IntCanvas map, int width )
-      {
-         // hit a wall
-         if ((pos.x < 0) || ((pos.x + rock.Width) > width)) {
-            return true; 
-         }
+         public int MaxHeight = 0; 
 
-         // hit the floor
-         if ((pos.y + rock.Height) > 1) {
-            return true; 
-         }
-
-         return map.CollidesWith(pos, rock); 
-      }
-
-      int? CheckForTetris(IntCanvas c, int y, int height)
-      {
-         for (int i = 0; i < height; ++i) {
-            bool hasTetris = true; 
-            int ly = y + i; 
-            for (int x = 0; x < 7; ++x) {
-               if (c.GetValue(x, ly) == 0) {
-                  hasTetris = false; 
-                  break; 
-               }
-            }
-
-            if (hasTetris) {
-               return ly; 
+         public void IncrementRockIndex()
+         {
+            ++RockIndex; 
+            if (RockIndex >= Shapes.Length) { 
+               RockIndex = 0; 
             }
          }
 
-         return null; 
-      }
+         public void IncrementMoveIndex()
+         {
+            ++MoveIndex;
+            if (MoveIndex >= Moves.Length) {
+               MoveIndex = 0; 
+            }
+         }
 
-      //----------------------------------------------------------------------------------------------
-      public override string RunA()
-      {
-         IntCanvas canvas = new(); 
-         canvas.SetSize( new ivec2(1, 7) ); 
-         int maxHeight = 0; 
-         int width = 7; 
+         private bool Collides( ivec2 pos, IntMap rock )
+         {
+            // hit a wall
+            if ((pos.x < 0) || ((pos.x + rock.Width) > Width)) {
+               return true; 
+            }
 
-         int numRocks = 5050; 
-         int rockIdx = 0; 
-         int dirIdx = 0; 
+            // hit the floor
+            if ((pos.y + rock.Height) > 1) {
+               return true; 
+            }
 
-         for (int ri = 0; ri < numRocks; ++ri) {
-            IntMap rock = Shapes[rockIdx]; 
-            ivec2 pos = new ivec2(2, maxHeight - rock.Height - 2); 
+            return Canvas.CollidesWith(pos, rock); 
+         }
 
+         public void DropNext()
+         {
+            IntMap rock = Shapes[RockIndex]; 
+            IncrementRockIndex();
+
+            ivec2 pos = new ivec2(2, MaxHeight - rock.Height - 2); 
             while (true) { // got to remember I'm moving positive to go down
-               ivec2 dir = Push[dirIdx]; 
-               ++dirIdx; 
-               if (dirIdx >= Push.Count) {
-                  dirIdx = 0; 
-               }
+               int dir = Moves[MoveIndex]; 
+               IncrementMoveIndex(); 
 
-               if (!Collides(pos + dir, rock, canvas, width)) {
-                  pos = pos + dir; 
+               pos.x += dir; 
+               if (Collides(pos, rock)) {
+                  pos.x -= dir; 
                }
 
                pos.y += 1; 
-               if (Collides(pos, rock, canvas, width)) {
+               if (Collides(pos, rock)) {
                   pos.y -= 1; 
                   break; // hit a rock or hit bottom, stop
                }
             }
 
             // we hit, draw this intno the canvas
-            canvas.DrawIntMap(pos, rock); 
-            maxHeight = Math.Min(pos.y - 1, maxHeight);  
-
-            int? lineIdx = CheckForTetris(canvas, pos.y, rock.Height); 
-            if (lineIdx.HasValue) { 
-               Util.WriteLine($"Tetris: Line {1 - lineIdx.Value}, rockIdx: {rockIdx},  windIdx: {dirIdx}, rockCount={ri + 1}, linevalue={-maxHeight}");
-            }
-
-            ++rockIdx; 
-            if (rockIdx >= Shapes.Count) {
-               rockIdx = 0; 
-            }
+            Canvas.DrawIntMap(pos, rock); 
+            MaxHeight = Math.Min(pos.y - 1, MaxHeight);  
          }
 
-         // Util.WriteLine(canvas.ToString(" #") + "\n-------\n"); 
+         public int Height => -MaxHeight; 
+         public ivec2 MoveState => new ivec2(RockIndex, MoveIndex);
+      }
 
-         return (-maxHeight).ToString(); 
+      //----------------------------------------------------------------------------------------------
+      public override void ParseInput()
+      {
+         List<string> lines = Util.ReadFileToLines(InputFile);
+         Moves = lines[0].Select( c => (c == '>') ? 1 : -1 ).ToArray();
+
+         Shapes = new IntMap[5];
+         // Add shapes
+         Shapes[0] = new IntMap(
+            "####"
+         );
+         Shapes[1] = new IntMap(
+            " # \n" +
+            "###\n" +
+            " # "
+         ); 
+         Shapes[2] = new IntMap(
+            "  #\n" +
+            "  #\n" +
+            "###"
+         ); 
+         Shapes[3] = new IntMap(
+            "#\n" +
+            "#\n" +
+            "#\n" +
+            "#"
+         ); 
+         Shapes[4] = new IntMap(
+            "##\n" + 
+            "##"
+         ); 
+      }
+
+      
+
+
+
+      //----------------------------------------------------------------------------------------------
+      public override string RunA()
+      {
+         GameState state = new GameState(); 
+         state.Shapes = Shapes;
+         state.Moves = Moves; 
+
+         int numRocks = 2022; 
+         for (int ri = 0; ri < numRocks; ++ri) {
+            state.DropNext(); 
+         }
+
+         return state.Height.ToString(); 
       }
 
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         return ""; 
+         // so, similar, but drop until I notice a pattern.  
+         GameState state = new GameState(); 
+         state.Shapes = Shapes;
+         state.Moves = Moves; 
+
+         Dictionary<int,(int, int, Int64)> SeenStates = new(); 
+
+         Int64 totalRocks = 1000000000000; 
+         Int64 totalHeight = 0; 
+
+         for (int ri = 0; ri <= 10000; ++ri) {
+            if (state.RockIndex == 0) {
+               int moveIdx = state.MoveIndex; 
+               if (SeenStates.ContainsKey(moveIdx)) { 
+                  (int rock, int height, Int64 skip) = SeenStates[moveIdx]; 
+
+                  Int64 hInterval = state.Height - height; 
+                  Int64 rInterval = ri - rock; 
+                  if (rInterval == skip) { // did we skip the same amount since last we saw this come up?  Probably a repeat...
+                     totalHeight += state.Height; 
+                     totalRocks = totalRocks - ri;
+
+                  
+                     Int64 intervals = totalRocks / rInterval; 
+                     totalHeight += intervals * hInterval; 
+
+                     totalRocks -= intervals * rInterval; 
+                     break; 
+                  } else {
+                     SeenStates[moveIdx] = (ri, state.Height, rInterval);
+                  }
+               } else { 
+                  SeenStates[moveIdx] = (ri, state.Height, 0);
+               }
+            }
+            state.DropNext();
+         }
+
+         // okay, we just need to close out
+         int rem0 = state.Height; 
+         for (Int64 i = 0; i < totalRocks; ++i) {
+            state.DropNext(); 
+         }
+         totalHeight += state.Height - rem0; 
+
+         return totalHeight.ToString(); 
       }
    }
 }
