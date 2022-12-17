@@ -3,6 +3,48 @@ using System.Text;
 
 namespace AoC
 {
+   public class IntMap
+   {
+      public ivec2 Size; 
+      public int[] Data = new int[0]; 
+
+      public IntMap( ivec2 size, int defValue = 0 )
+      {
+         Size = size; 
+         int len = size.Product(); 
+         Data = new int[len]; 
+         Data.SetAll(defValue); 
+      }
+
+      public IntMap( string shape )
+      {
+         string[] lines = shape.Split('\n'); 
+         Size = new ivec2(lines[0].Length, lines.Length); 
+         Data = new int[Size.Product()]; 
+         
+         int y = 0;
+         foreach (string line in lines) {
+            int x = 0; 
+            foreach (char c in line) {
+               Set(x, y, c == ' ' ? 0 : 1); 
+               ++x; 
+            }
+            ++y; 
+         }
+      }
+
+      public int Height { get { return Size.y; } }
+      public int Width { get { return Size.x; } }
+
+      private int GetIndex( ivec2 p ) { return p.y * Width + p.x; }
+      private int GetIndex( int x, int y ) { return y * Width + x; }
+
+      public void Set( ivec2 p, int v ) => Data[GetIndex(p)] = v; 
+      public void Set( int x, int y, int v ) => Data[GetIndex(x, y)] = v; 
+      public int Get( ivec2 p ) => Data[GetIndex(p)]; 
+      public int Get( int x, int y ) => Data[GetIndex(x, y)]; 
+   }
+
    //----------------------------------------------------------------------------------------------
    // Doing this as a infinite sparse tiled grid would be awesome,
    // but for now, just going to make a growable sheet of paper, anytime we add a point, expand it to fit that new point
@@ -61,7 +103,7 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
-      public int GetValue(ivec2 pos)
+      public int GetValue( ivec2 pos )
       {
          ivec2 lpos = pos - Min;
          if ((lpos >= ivec2.ZERO) && (lpos < Size)) {
@@ -70,6 +112,8 @@ namespace AoC
             return DefaultValue;
          }
       }
+
+      public int GetValue( int x, int y ) => GetValue( new ivec2( x, y ) ); 
 
       //----------------------------------------------------------------------------------------------
       public ivec2? GetOpenPosition(ivec2 p0, ivec2[] dirs, int openVal = 0)
@@ -86,6 +130,37 @@ namespace AoC
 
       //----------------------------------------------------------------------------------------------
       public ivec2 GetMaxSetPosition() => MaxSet; 
+
+      //----------------------------------------------------------------------------------------------
+      // checks if this shape and map have overlap (non-zero values sharing a cell)
+      public bool CollidesWith( ivec2 p, IntMap shape )
+      {
+         for (int y = 0; y < shape.Height; ++y) {
+            for (int x = 0; x < shape.Width; ++x) {
+               int mapValue = GetValue( p.x + x, p.y + y ); 
+               int shapeValue = shape.Get( x, y ); 
+               if ((mapValue != 0) && (shapeValue != 0)) {
+                  return true; 
+               }
+            }
+         }
+
+         return false; 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      // Draws, assuming 0's are transparent
+      public void DrawIntMap( ivec2 p, IntMap shape )
+      {
+         for (int y = 0; y < shape.Height; ++y) {
+            for (int x = 0; x < shape.Width; ++x) {
+               int shapeValue = shape.Get( x, y ); 
+               if (shapeValue > 0) {
+                  SetValue( p.x + x, p.y + y, shapeValue ); 
+               }
+            }
+         }
+      }
 
       //----------------------------------------------------------------------------------------------
       public int SetValue(ivec2 pos, int val)
