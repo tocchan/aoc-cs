@@ -130,6 +130,22 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public static int CeilToPow2(int val)
+      {
+         if (val < 2) {
+            return 1; 
+         } else { 
+            --val; 
+            val |= (val >> 1); 
+            val |= (val >> 2); 
+            val |= (val >> 4); 
+            val |= (val >> 8); 
+            val |= (val >> 16); 
+            return val + 1; 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       public static int HexToByte(char c)
       {
          return (c <= '9') ? (c - '0') : (c - 'A' + 10);

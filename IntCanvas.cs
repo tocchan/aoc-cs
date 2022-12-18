@@ -205,10 +205,18 @@ namespace AoC
          }
 
          ivec2 newMin = ivec2.Min(min, Min);
-         ivec2 newMax = ivec2.Max(max, maxSize);
-         ivec2 newSize = newMax - newMin + ivec2.ONE;
-         newMin = ivec2.FloorToBoundary(newMin, 64);
-         newSize = ivec2.CeilToBoundary(newSize, 64);
+         ivec2 newMax = ivec2.Max(max + ivec2.ONE, maxSize);
+         ivec2 newSize = newMax - newMin;
+         newSize = ivec2.Max(ivec2.CeilToPow2(newSize), new ivec2(16));
+
+         ivec2 sizeChange = newSize - Size; 
+         if (newMin.x < Min.x) {
+            // grow left
+            newMin.x = Min.x - sizeChange.x; 
+         }
+         if (newMin.y < Min.y) {
+            newMin.y = Min.y - sizeChange.y; 
+         }
 
          int[] newData = new int[newSize.Product()];
          for (int i = 0; i < newData.Length; ++i) {
@@ -216,11 +224,11 @@ namespace AoC
          }
 
          // copy old data ver
-         ivec2 oldOffset = Min - newMin;
+         ivec2 offset = Min - newMin;
          for (int y = 0; y < Size.y; ++y) {
             for (int x = 0; x < Size.x; ++x) {
                int oldIdx = y * Size.x + x;
-               int newIdx = (y + oldOffset.y) * newSize.x + (x + oldOffset.x);
+               int newIdx = (y + offset.y) * newSize.x + (x + offset.x);
                newData[newIdx] = Data[oldIdx];
             }
          }

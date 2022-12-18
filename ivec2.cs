@@ -124,21 +124,23 @@ namespace AoC
       public static ivec2 FloorToBoundary(ivec2 val, int boundary)
       {
          ivec2 offset = ivec2.Mod(val, boundary);
-         if (offset == ivec2.ZERO) {
-            return val;
-         }
-
          return val - offset;
       }
 
       public static ivec2 CeilToBoundary(ivec2 val, int boundary)
       {
-         ivec2 offset = ivec2.Mod(val, boundary);
-         if (offset == ivec2.ZERO) {
-            return offset;
-         }
+         ivec2 ret = ivec2.ZERO; 
+         ret.x = (int) Util.CeilToBoundary(val.x, boundary); 
+         ret.y = (int) Util.CeilToBoundary(val.y, boundary); 
+         return ret; 
+      }
 
-         return val + (new ivec2(boundary) - offset);
+      public static ivec2 CeilToPow2(ivec2 val)
+      {
+         return new ivec2(
+            Util.CeilToPow2(val.x), 
+            Util.CeilToPow2(val.y)
+         ); 
       }
 
       public static int Dot(ivec2 a, ivec2 b) => a.x * b.x + a.y * b.y;
