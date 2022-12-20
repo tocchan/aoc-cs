@@ -14,7 +14,7 @@ namespace AoC2022
    internal class Day19 : Day
    {
 
-      private string InputFile = "2022/inputs/19d.txt";
+      private string InputFile = "2022/inputs/19.txt";
 
       
       internal class Blueprint
@@ -236,9 +236,10 @@ namespace AoC2022
                state subBest = Compute(bp, ns.bots, minRem); 
                int score = subBest.res.w + ns.res.w;
                lowBound = Math.Max(score, lowBound); 
-               
-               // upper bound.... just assume I was able to build a geode bot this turn somehow
-               int potential = score + Math.Max(minRem - 1, 0); 
+              
+               // upper bound.... just assume I was able to build a geode bot next turn
+               // and sum up the total so far; 
+               int potential = score + (subBest.bots.w + 1) * Math.Max(minRem - 1, 0); 
 
                // no possible way to finish - trim it out
                if (potential < lowBound) {
@@ -314,8 +315,8 @@ namespace AoC2022
          {
             Blueprint bp = Inputs[idx]; 
             state s = Compute(bp, new ivec4(1, 0, 0, 0), minutes); 
-            Util.WriteLine($"\nInput {idx + 1};"); 
-            TraceTurns(s); 
+            // Util.WriteLine($"\nInput {idx + 1};"); 
+            // TraceTurns(s); 
             int geodes = s.res.w; 
             quality += bp.Index * geodes; 
          }
@@ -330,11 +331,14 @@ namespace AoC2022
          int result = 1; 
 
          // int idx = 1; 
-         int count = Math.Min(1, Inputs.Count); 
-         for (int idx = 0; idx < Inputs.Count; ++idx) 
+         int count = Math.Min(3, Inputs.Count); 
+         for (int idx = 0; idx < count; ++idx) 
          {
             Blueprint bp = Inputs[idx]; 
-            int geodes = Compute(bp, new ivec4(1, 0, 0, 0), minutes).res.w; 
+            state s = Compute(bp, new ivec4(1, 0, 0, 0), minutes); 
+            // Util.WriteLine($"\nInput {idx + 1};"); 
+            // TraceTurns(s); 
+            int geodes = s.res.w; 
             result *= geodes; 
          }
 
