@@ -34,6 +34,14 @@ namespace AoC
          w = wv; 
       }
 
+      public ivec4(ivec3 xyz, int wv) 
+      {
+         x = xyz.x; 
+         y = xyz.y; 
+         z = xyz.z; 
+         w = wv; 
+      }
+
       public int this[int i]
       {
          get => i switch {
@@ -77,6 +85,15 @@ namespace AoC
             }
          }
          return 0; 
+      }
+
+      public ivec3 xyz {
+         get => new ivec3(x, y, z);
+         set {
+            x = value.x; 
+            y = value.y; 
+            z = value.z; 
+         }
       }
 
       public static ivec4 operator +(ivec4 v) => v;
