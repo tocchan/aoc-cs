@@ -197,15 +197,7 @@ namespace AoC2022
             // get where I want to insert at
             llp? ins = v.next; 
             head = Remove(head, v); 
-
-            // get the item to insert be fore
-            if (move > 0) {
-               ins = ins!.get_next(move);  
-            } else if (move < 0) {
-               ins = ins!.get_prev(-move);
-            }
-
-            // insert it back
+            ins = ins!.get_next(move); 
             head = InsertBefore(head, v, ins);
          }
 
