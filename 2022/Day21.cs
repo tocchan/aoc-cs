@@ -32,7 +32,10 @@ namespace AoC2022
             if (Value != null) {
                return Value.Value;
             } else {
-               return EvalValue(); 
+               Int64 lh = Friends[LName].GetValue(); 
+               Int64 rh = Friends[RName].GetValue(); 
+               Value = Op!(lh, rh); 
+               return Value.Value; 
             }
          }
 
@@ -130,6 +133,7 @@ namespace AoC2022
       public override string RunA()
       {
          Monkey root = Monkies["root"]; 
+
          Int64 val = root.GetValue(); 
          return val.ToString(); 
       }
