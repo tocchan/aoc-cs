@@ -7,22 +7,23 @@ using System.Threading.Tasks;
 
 namespace AoC2022
 {
-   internal class Monkey
-   {
-      public List<Int64> Worry = new(); 
-      public Func<Int64,Int64>? Op; 
-      public Int64 Divisor = 1; 
-      public int MonkeyOnTrue = 0; 
-      public int MonkeyOnFalse = 0;  
 
-      public Int64 InspectionCount = 0; 
-   }
 
 
    internal class Day11 : Day
    {
       private string InputFile = "2022/inputs/11.txt";
       
+      internal class Monkey
+      {
+         public List<Int64> Worry = new(); 
+         public Func<Int64,Int64>? Op; 
+         public Int64 Divisor = 1; 
+         public int MonkeyOnTrue = 0; 
+         public int MonkeyOnFalse = 0;  
+
+         public Int64 InspectionCount = 0; 
+      }
       List<Monkey> Monkeys = new(); 
 
       //----------------------------------------------------------------------------------------------

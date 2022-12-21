@@ -11,16 +11,9 @@ namespace AoC2022
    {
       private string InputFile = "2022/inputs/21.txt";
       
-      Dictionary<string, Monkey21> Monkies = new(); 
+      Dictionary<string, Monkey> Monkies = new(); 
 
-      internal class Equation
-      {
-         public Int64? lh = null; 
-         public Int64? rh = null; 
-         public Int64 sol = 0; 
-      }
-
-      internal class Monkey21 
+      internal class Monkey 
       {
          public Int64 EvalValue()
          {
@@ -52,7 +45,7 @@ namespace AoC2022
 
          public char OpChar = ' '; 
 
-         public Dictionary<string, Monkey21> Friends = new(); 
+         public Dictionary<string, Monkey> Friends = new(); 
       }
 
 
@@ -99,7 +92,7 @@ namespace AoC2022
          foreach (string line in lines) {
             (string name, string val, _) = line.Split(": ");
 
-            Monkey21 m = new Monkey21(); 
+            Monkey m = new Monkey(); 
             m.Name = name; 
             m.Friends = Monkies; 
 
@@ -136,7 +129,7 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         Monkey21 root = Monkies["root"]; 
+         Monkey root = Monkies["root"]; 
          Int64 val = root.GetValue(); 
          return val.ToString(); 
       }
@@ -154,15 +147,15 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       Int64 HumValue = 1; 
       
-      Int64 GetHumanValue(Monkey21 root, Monkey21 me, Int64 wantedValue) 
+      Int64 GetHumanValue(Monkey root, Monkey me, Int64 wantedValue) 
       {
          // Util.WriteLine($"\nEval {root.Name} to equal {wantedValue}"); 
          if (root == me) {
             return wantedValue; 
          }
 
-         Monkey21 lh = Monkies[root.LName]; 
-         Monkey21 rh = Monkies[root.RName]; 
+         Monkey lh = Monkies[root.LName]; 
+         Monkey rh = Monkies[root.RName]; 
 
          // just picking numbers at random
          me.Value = 2213;  
@@ -191,12 +184,12 @@ namespace AoC2022
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         Monkey21 root = Monkies["root"]; 
+         Monkey root = Monkies["root"]; 
          root.Op = (a, b) => (a == b) ? 1 : 0; 
          root.RevOp = (a, b, c) => (a == null) ? b!.Value : a!.Value; 
          root.OpChar = '='; 
 
-         Monkey21 me = Monkies["humn"]; 
+         Monkey me = Monkies["humn"]; 
          me.Value = HumValue; 
          me.Op = null; 
 
