@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,23 +78,25 @@ namespace AoC2022
                MoveOneA(); 
             }
 
-            if (ins.y == 0) {
-               Direction.RotateLeft(); 
-            } else if (ins.y == 1) {
-               Direction.RotateRight(); 
-            }
+            Turn(ins.y);
          }
 
          //----------------------------------------------------------------------------------------------
-          public void MoveB( ivec2 ins ) 
+         public void MoveB( ivec2 ins ) 
          {
             for (int i = 0; i < ins.x; ++i) {
                MoveOneB(); 
             }
 
-            if (ins.y == 0) {
+            Turn(ins.y); 
+         }
+
+         //----------------------------------------------------------------------------------------------
+         public void Turn(int turnIns) 
+         {
+            if (turnIns == 0) {
                Direction.RotateLeft(); 
-            } else if (ins.y == 1) {
+            } else if (turnIns == 1) {
                Direction.RotateRight(); 
             }
          }
