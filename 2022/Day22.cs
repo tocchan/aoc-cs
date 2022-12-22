@@ -193,7 +193,7 @@ namespace AoC2022
          public override string ToString()
          {
             string facing = ">v<^"; 
-            return $"Tile:{CurTile.Index}  Local:{Position}  World:{GetRealLocation()}  Facing: {facing[GetFacingValue()]}"; 
+            return $"Tile:{CurTile.Index}  Local:{Position.ToString().PadRight(7)}  World:{GetRealLocation().ToString().PadRight(7)}  Facing: {facing[GetFacingValue()]}"; 
          }
       }
 
@@ -279,8 +279,7 @@ namespace AoC2022
             }
          }
 
-         while (ConnectCubePass()) { 
-         }
+         while (ConnectCubePass()) {}
       }
 
       //----------------------------------------------------------------------------------------------
@@ -366,14 +365,29 @@ namespace AoC2022
       }
 
       //----------------------------------------------------------------------------------------------
+      private string InsToString( ivec2 ins ) 
+      {
+         string s = ins.x.ToString(); 
+         if (ins.y == 0) {
+            s += 'L'; 
+         } else if (ins.y == 1) {
+            s += 'R';
+         }
+         return s.PadLeft(4); 
+      }
+
+
+      //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
          Cursor c = new Cursor(Start!); 
 
-         // Util.WriteLine(c.ToString()); 
+         // Util.WriteLine("     Start -> " + c.ToString()); 
+         int insIdx = 1; 
          foreach (ivec2 ins in Instructions) {
             c.MoveB(ins); 
-            // Util.WriteLine(c.ToString()); 
+            // Util.WriteLine($"{insIdx.ToString().PadLeft(4)}. {InsToString(ins)} -> {c}"); 
+            ++insIdx; 
          }
 
          ivec2 pos = c.GetRealLocation() + ivec2.ONE; 
