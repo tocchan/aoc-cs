@@ -169,6 +169,25 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public void SetFromTightBlock(string[] lines, string valueMap, int boundsValue = int.MaxValue)
+      {
+         BoundsValue = boundsValue;
+         int width = lines[0].Length;
+         int height = lines.Length;
+
+         Resize(width, height);
+
+         int idx = 0;
+         foreach (string line in lines) {
+            foreach (char c in line) {
+               int cval = valueMap.IndexOf(c);
+               Data[idx] = cval;
+               ++idx;
+            }
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       public int GetIndex(int x, int y) => y * Size.x + x;
       public int GetIndex(ivec2 p) => GetIndex(p.x, p.y);
 

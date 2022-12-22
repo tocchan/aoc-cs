@@ -8,6 +8,16 @@ using System.Threading.Tasks;
 
 namespace AoC
 {
+
+   public enum eDirection
+   {
+      Right = 0, 
+      Left, 
+      Up, 
+      Down, 
+      None,
+   }
+
    public struct ivec2
    {
       public int x = 0;
