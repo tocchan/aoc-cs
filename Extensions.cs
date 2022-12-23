@@ -112,6 +112,11 @@ namespace AoC
          _ => eDirection.None,
       }; 
 
+      public static ivec2 ToVector( this eDirection d )
+      {
+         return d == eDirection.None ? ivec2.ZERO : ivec2.DIRECTIONS[(int)d]; 
+      }
+
       public static eDirection ToDirection( this ivec2 v )
       {
          for (int i = 0; i < 4; ++i) {

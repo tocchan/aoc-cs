@@ -92,6 +92,14 @@ namespace AoC
          Console.WriteLine(ApplyMarkup(line));
       }
 
+      public static bool IsTraceEnabled = false; 
+      public static void TraceLine(string line)
+      {
+         if (IsTraceEnabled) {
+            WriteLine(line); 
+         }
+      }
+
       //----------------------------------------------------------------------------------------------
       public static void WriteArray<T>(IEnumerable<T> array)
       {

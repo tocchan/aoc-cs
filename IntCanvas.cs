@@ -72,10 +72,42 @@ namespace AoC
          Min = toCopy.Min;
          Size = toCopy.Size;
          DefaultValue = toCopy.DefaultValue;
+         MinSet = toCopy.MinSet; 
+         MaxSet = toCopy.MaxSet; 
 
          Data = new int[Size.Product()];
          toCopy.Data.CopyTo(Data, 0);
       }
+
+      //----------------------------------------------------------------------------------------------
+      void Clear()
+      {
+         Data = new int[0];
+         Min = new ivec2(0);
+         Size = new ivec2(0);
+         MinSet = new ivec2(int.MaxValue); 
+         MaxSet = new ivec2(int.MinValue); 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public void InitFromStringArray(string[] lines, Dictionary<char,int> values)
+      {
+         ivec2 size = new ivec2(lines[0].Length, lines.Length); 
+
+         Clear(); 
+         SetSize(size); 
+
+         for (int y = 0; y < size.y; ++y) {
+            string s = lines[y]; 
+            for (int x = 0; x < size.x; ++x) {
+               int v = DefaultValue;
+               values.TryGetValue(s[x], out v); 
+
+               SetValue( x, y, v ); 
+            }
+         }
+      }
+
 
       //----------------------------------------------------------------------------------------------
       object ICloneable.Clone()
@@ -129,6 +161,7 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public ivec2 GetMinSetPosition() => MinSet; 
       public ivec2 GetMaxSetPosition() => MaxSet; 
 
       //----------------------------------------------------------------------------------------------
@@ -339,6 +372,33 @@ namespace AoC
          return sb.ToString();
       }
 
+      //----------------------------------------------------------------------------------------------
+      public string ToString(char defValue, char otherValue)
+      {
+         // nothing was set in this canvas
+         if (MinSet > MaxSet) {
+            return "<empty>";
+         }
+
+         ivec2 size = MaxSet - MinSet + ivec2.ONE;
+
+         StringBuilder sb = new StringBuilder();
+
+         int idx = 0;
+         for (int y = 0; y < size.y; ++y) {
+            for (int x = 0; x < size.x; ++x) {
+               ivec2 pos = MinSet + new ivec2(x, y);
+               int i = GetValue(pos);
+               ++idx;
+               sb.Append(i == DefaultValue ? defValue : otherValue);
+            }
+            sb.Append('\n');
+         }
+
+         return sb.ToString();
+      }
+
+      //----------------------------------------------------------------------------------------------
       private bool IsInBounds(ivec2 p)
       {
          return (p >= MinSet) && (p <= MaxSet);
@@ -439,9 +499,8 @@ namespace AoC
       //----------------------------------------------------------------------------------------------
       public bool HasNeighbor(ivec2 pos, int val)
       {
-         ivec2[] dirs = { ivec2.RIGHT, ivec2.LEFT, ivec2.UP, ivec2.DOWN };
          for (int i = 0; i < 4; ++i) {
-            if (GetValue(pos + dirs[i]) == val) {
+            if (GetValue(pos + ivec2.DIRECTIONS[i]) == val) {
                return true;
             }
          }
@@ -455,7 +514,7 @@ namespace AoC
       //----------------------------------------------------------------------------------------------
       // Runs a function on all set values.  All gets during the callback
       // use the previous value, and will set a new value.
-      public int Automata(Func<ivec2, int, int> rule)
+      public int Automata(Func<IntCanvas, ivec2, int, int> rule)
       {
          int tilesChanged = 0;
          IntCanvas copy = new IntCanvas(this);
@@ -465,7 +524,7 @@ namespace AoC
             for (int x = 0; x <= size.x; ++x) {
                ivec2 pos = MinSet + new ivec2(x, y);
                int oldValue = GetValue(pos);
-               int newValue = rule(pos, oldValue);
+               int newValue = rule(this, pos, oldValue);
 
                if (newValue != oldValue) {
                   copy.SetValue(pos, newValue);

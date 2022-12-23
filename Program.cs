@@ -1,6 +1,6 @@
 ﻿using AoC; 
 
-Day? day = Day.Create( "2022", args.FirstOrDefault(), typeof(AoC2022.Day16) );
+Day? day = Day.Create( "2022", args.FirstOrDefault(), typeof(AoC2022.Day23) );
 
 
 Util.WriteLine( @"[+white]                       /)"); 

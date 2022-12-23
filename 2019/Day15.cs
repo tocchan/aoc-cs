@@ -99,9 +99,9 @@ namespace AoC2019
        
         
         //----------------------------------------------------------------------------------------------
-        private int Rule( ivec2 pos, int val )
+        private int Rule( IntCanvas c, ivec2 pos, int val )
         {
-            if ((val == 1) && Map.HasNeighbor(pos, 3)) {
+            if ((val == 1) && c.HasNeighbor(pos, 3)) {
                 return 3; 
             }
 

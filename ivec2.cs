@@ -18,6 +18,18 @@ namespace AoC
       None,
    }
 
+   public enum eCardinal
+   {
+      East, 
+      NorthEast, 
+      North, 
+      NorthWest, 
+      West, 
+      SouthWest, 
+      South, 
+      SouthEast
+   };
+
    public struct ivec2
    {
       public int x = 0;
@@ -31,6 +43,16 @@ namespace AoC
       public static readonly ivec2 UP = new ivec2(0, -1);
       public static readonly ivec2 DOWN = new ivec2(0, 1);
       public static readonly ivec2[] DIRECTIONS = { RIGHT, LEFT, UP, DOWN }; 
+      public static readonly ivec2[] CARDINAL = {
+         RIGHT, 
+         RIGHT + UP, 
+         UP, 
+         UP + LEFT, 
+         LEFT, 
+         DOWN + LEFT, 
+         DOWN, 
+         DOWN + RIGHT
+      };
 
 
       public ivec2(int v)
