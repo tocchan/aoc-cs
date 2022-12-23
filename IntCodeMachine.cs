@@ -8,6 +8,9 @@ using System.Diagnostics;
 namespace AoC
 {
     //----------------------------------------------------------------------------------------------
+    // @123 -> direct read at offset 123
+    // R123 -> read from relative offset
+    // 123 -> direct value
     //----------------------------------------------------------------------------------------------
     public class IntCodeMachine
     {
