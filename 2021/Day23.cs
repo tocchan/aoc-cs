@@ -445,8 +445,6 @@ namespace AoC2021
             PriorityQueue<IntHeatMap2D,int> moves = new PriorityQueue<IntHeatMap2D, int>(); 
             moves.Enqueue(initial, initialCost); 
 
-            int target = 56982; 
-
             SeenStates.Clear(); 
             int turn = 0; 
             while (moves.Count > 0)
