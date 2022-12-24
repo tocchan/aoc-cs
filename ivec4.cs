@@ -34,6 +34,14 @@ namespace AoC
          w = wv; 
       }
 
+      public ivec4(ivec2 xy, ivec2 zw) 
+      {
+         x = xy.x; 
+         y = xy.y; 
+         z = zw.x; 
+         w = zw.y; 
+      }
+
       public ivec4(ivec3 xyz, int wv) 
       {
          x = xyz.x; 
@@ -87,6 +95,26 @@ namespace AoC
          return 0; 
       }
 
+      //----------------------------------------------------------------------------------------------
+      // swizzles
+      //----------------------------------------------------------------------------------------------
+      
+      public ivec2 xy {
+         get => new ivec2(x, y);
+         set {
+            x = value.x; 
+            y = value.y; 
+         }
+      }
+
+      public ivec2 zw {
+         get => new ivec2(z, w);
+         set {
+            z = value.x; 
+            w = value.y; 
+         }
+      }
+
       public ivec3 xyz {
          get => new ivec3(x, y, z);
          set {
@@ -96,6 +124,11 @@ namespace AoC
          }
       }
 
+
+      //----------------------------------------------------------------------------------------------
+      // operators
+      //----------------------------------------------------------------------------------------------
+      
       public static ivec4 operator +(ivec4 v) => v;
       public static ivec4 operator -(ivec4 v) => new ivec4(-v.x, -v.y, -v.z, -v.w);
       public static ivec4 operator +(ivec4 a, ivec4 b) => new ivec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);

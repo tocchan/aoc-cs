@@ -112,6 +112,17 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public static int Mod( int lh, int rh )
+      {
+         int r = lh % rh; 
+         if (r < 0) {
+            return r + rh; 
+         } else {
+            return r; 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       public static (float, float) Quadratic(float a, float b, float c)
       {
          float inner = b * b - 4 * a * c;

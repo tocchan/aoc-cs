@@ -108,14 +108,21 @@ namespace AoC
          set { if (i == 0) { x = value; } else { y = value; } }
       }
 
+      //----------------------------------------------------------------------------------------------
+      // operators
+      //----------------------------------------------------------------------------------------------
+
       public static ivec2 operator +(ivec2 v) => v;
       public static ivec2 operator -(ivec2 v) => new ivec2(-v.x, -v.y);
       public static ivec2 operator +(ivec2 a, ivec2 b) => new ivec2(a.x + b.x, a.y + b.y);
       public static ivec2 operator -(ivec2 a, ivec2 b) => new ivec2(a.x - b.x, a.y - b.y);
+      public static ivec2 operator -(ivec2 a, int b) => new ivec2(a.x - b, a.y - b);
       public static ivec2 operator *(ivec2 a, ivec2 b) => new ivec2(a.x * b.x, a.y * b.y);
       public static ivec2 operator *(int a, ivec2 v) => new ivec2(a * v.x, a * v.y);
       public static ivec2 operator *(ivec2 v, int a) => new ivec2(a * v.x, a * v.y);
       public static ivec2 operator /(ivec2 v, int a) => new ivec2(v.x / a, v.y / a);
+      public static ivec2 operator %(ivec2 a, ivec2 b) => new ivec2(a.x % b.x, a.y % b.y);
+      public static ivec2 operator %(ivec2 v, int a) => new ivec2(v.x % a, v.y % a);
       public static bool operator ==(ivec2 a, ivec2 b) => (a.x == b.x) && (a.y == b.y);
       public static bool operator !=(ivec2 a, ivec2 b) => (a.x != b.x) || (a.y != b.y);
       public static bool operator <(ivec2 a, ivec2 b) => (a.x < b.x) && (a.y < b.y);
@@ -138,20 +145,8 @@ namespace AoC
          return ret;
       }
 
-      public static ivec2 Mod(ivec2 val, int den)
-      {
-         int x = val.x % den;
-         int y = val.y % den;
-
-         if (x < 0) {
-            x += den;
-         }
-         if (y < 0) {
-            y += den;
-         }
-
-         return new ivec2(x, y);
-      }
+      public static ivec2 Mod(ivec2 val, ivec2 den) => new ivec2( Util.Mod(val.x, den.x), Util.Mod(val.y, den.y) ); 
+      public static ivec2 Mod(ivec2 val, int den) => new ivec2( Util.Mod(val.x, den), Util.Mod(val.y, den) ); 
 
       public static ivec2 FloorToBoundary(ivec2 val, int boundary)
       {
@@ -204,5 +199,24 @@ namespace AoC
       {
          return $"{x},{y}";
       }
+
+      public static IEnumerable<ivec2> EnumArea( ivec2 size, ivec2 origin )
+      {
+         ivec2 r = origin; 
+         for (int y = 0; y < size.y; ++y) {
+            r.x = origin.x; 
+            for (int x = 0; x < size.x; ++x) {
+               yield return r; 
+               ++r.x; 
+            }
+            ++r.y;
+         }
+      }
+
+      public static IEnumerable<ivec2> EnumArea( ivec2 size )
+      {
+         return EnumArea( size, ivec2.ZERO ); 
+      }
+
    }
 }
