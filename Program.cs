@@ -1,6 +1,6 @@
 ﻿using AoC; 
 
-Day? day = Day.Create( "2022", args.FirstOrDefault(), typeof(AoC2022.Day25) );
+Day? day = Day.Create( "2023", args.FirstOrDefault(), typeof(AoC2023.Day01) );
 
 
 Util.WriteLine( @"[+white]                       /)"); 
@@ -8,7 +8,7 @@ Util.WriteLine( @"[+white]              /\___/\ ((");
 Util.WriteLine( @"[+white]              \`[yellow]@[-]_[yellow]@[+white]'/  ))"); 
 Util.WriteLine( @"[+white]              {_:Y:.}_//" ); 
 Util.WriteLine( @"[+white]    ----------{_}^-'{_}----------"); 
-Util.WriteLine( @"[  cyan]           AoC.2022." + day.GetType().Name    ); 
+Util.WriteLine( @"[  cyan]           AoC.2023." + day.GetType().Name    ); 
 Util.WriteLine(  "[+white]    -----------------------------\n" ); 
 
 string answerA; 
