@@ -29,8 +29,8 @@ namespace AoC2023
       {
          int total = 0; 
          foreach (var line in Lines) {
-            char first = line.First(x => IsDigit(x)); 
-            char last = line.Last(x => IsDigit(x)); 
+            char first = line.First(Util.IsDigit); 
+            char last = line.Last(Util.IsDigit); 
 
             string number = first.ToString() + last.ToString(); 
             int num = int.Parse(number); 
@@ -75,3 +75,4 @@ namespace AoC2023
       }
    }
 }
+

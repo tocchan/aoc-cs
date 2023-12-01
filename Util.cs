@@ -301,5 +301,12 @@ namespace AoC
          Int64 gcd = GCD(a, b); 
          return (a / gcd) * b; 
       }
+
+      //----------------------------------------------------------------------------------------------
+      public static bool IsDigit(char c) => (c >= '0') && (c <= '9'); 
+
+      public static bool IsLetter(char c) => ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')); 
+
+      public static bool IsAlphaNumeric(char c) => IsDigit(c) || IsLetter(c); 
    }
 }
