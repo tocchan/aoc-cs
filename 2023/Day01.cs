@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,30 +11,67 @@ namespace AoC2023
    internal class Day01 : Day
    {
       private string InputFile = "2023/inputs/01.txt";
-      private List<List<int>> Elves = new List<List<int>>(); 
+      private List<string> Lines = new List<string>();  
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
       {
-         List<string> lines = Util.ReadFileToLines(InputFile);
+         Lines = Util.ReadFileToLines(InputFile);
+      }
 
-         foreach (List<string> group in lines.SplitAllWhen(x => (x.Length == 0))) {
-            List<int> elf = group.Select(int.Parse).ToList(); 
-            Elves.Add(elf); 
-         }
+      private bool IsDigit(char c)
+      {
+         return (c >= '0') && (c <= '9'); 
       }
 
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         return "test"; 
-      }
+         int total = 0; 
+         foreach (var line in Lines) {
+            char first = line.First(x => IsDigit(x)); 
+            char last = line.Last(x => IsDigit(x)); 
 
+            string number = first.ToString() + last.ToString(); 
+            int num = int.Parse(number); 
+            total += num; 
+         }
+         return total.ToString(); 
+      }
 
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         return "test2";
+         string[] things = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+            "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+
+         int total = 0;
+         foreach (var line in Lines) {
+            int minIndex = line.Length;
+            int maxIndex = -1;
+            int minValue = 0;
+            int maxValue = 0;
+            for (int i = 0; i < things.Length; ++i) {
+               string thing = things[i];
+               int newMin = line.IndexOf(thing);
+               int newMax = line.LastIndexOf(thing);
+
+               if ((newMin > -1) && (newMin < minIndex)) {
+                  minIndex = newMin;
+                  minValue = i % 10;
+               }
+
+               if (newMax > maxIndex) {
+                  maxIndex = newMax;
+                  maxValue = i % 10;
+               }
+            }
+            string valueString = minValue.ToString() + maxValue.ToString();
+            int value = int.Parse(valueString);
+            total += value; 
+         }
+
+         return total.ToString(); 
       }
    }
 }
