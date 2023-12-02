@@ -20,6 +20,7 @@ namespace AoC2023
          Games = Util.ReadFileToLines(InputFile);
       }
 
+      //----------------------------------------------------------------------------------------------
       private Dictionary<string, int>[] ParseTurns(string turns)
       {
          List<Dictionary<string, int>> result = new List<Dictionary<string, int>>(); 
@@ -37,6 +38,7 @@ namespace AoC2023
          return result.ToArray(); 
       }
 
+      //----------------------------------------------------------------------------------------------
       private bool IsPossible(Dictionary<string, int> turn, Dictionary<string, int> possible)
       {
          foreach ((var color, var count) in turn) {
@@ -52,6 +54,7 @@ namespace AoC2023
          return true; 
       }
 
+      //----------------------------------------------------------------------------------------------
       private bool IsGamePossible(string game, Dictionary<string, int> possible)
       {
          Dictionary<string, int>[] pulls = ParseTurns(game);
@@ -85,6 +88,7 @@ namespace AoC2023
          return total.ToString();  
       }
 
+      //----------------------------------------------------------------------------------------------
       private int GetMinPower(string turnString)
       {
          Dictionary<string, int> minTurns = new Dictionary<string, int>(); 
@@ -92,11 +96,7 @@ namespace AoC2023
          
          foreach (var turn in turns) {
             foreach ((var color, var count) in turn) {
-               if (minTurns.ContainsKey(color)) {
-                  minTurns[color] = Math.Max(minTurns[color], count); 
-               } else {
-                  minTurns[color] = count; 
-               }
+               minTurns[color] = Math.Max(minTurns.GetValueOrDefault(color, 0), count); 
             }
          }
 

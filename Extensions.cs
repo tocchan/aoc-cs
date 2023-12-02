@@ -85,6 +85,7 @@ namespace AoC
          return list.SplitAllWhen<T>(x => (x != null) && x.Equals(splitter));
       }
 
+      //----------------------------------------------------------------------------------------------
       public static eDirection Negate( this eDirection d ) => d switch 
       {
          eDirection.Right => eDirection.Left, 
@@ -94,6 +95,7 @@ namespace AoC
          _ => eDirection.None,
       }; 
 
+      //----------------------------------------------------------------------------------------------
       public static eDirection RotateLeft( this eDirection d ) => d switch 
       {
          eDirection.Right => eDirection.Up, 
@@ -103,6 +105,7 @@ namespace AoC
          _ => eDirection.None,
       }; 
 
+      //----------------------------------------------------------------------------------------------
       public static eDirection RotateRight( this eDirection d ) => d switch 
       {
          eDirection.Right => eDirection.Down, 
@@ -112,11 +115,13 @@ namespace AoC
          _ => eDirection.None,
       }; 
 
+      //----------------------------------------------------------------------------------------------
       public static ivec2 ToVector( this eDirection d )
       {
          return d == eDirection.None ? ivec2.ZERO : ivec2.DIRECTIONS[(int)d]; 
       }
 
+      //----------------------------------------------------------------------------------------------
       public static eDirection ToDirection( this ivec2 v )
       {
          for (int i = 0; i < 4; ++i) {
