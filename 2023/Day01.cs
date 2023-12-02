@@ -19,11 +19,6 @@ namespace AoC2023
          Lines = Util.ReadFileToLines(InputFile);
       }
 
-      private bool IsDigit(char c)
-      {
-         return (c >= '0') && (c <= '9'); 
-      }
-
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
