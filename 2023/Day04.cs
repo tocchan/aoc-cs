@@ -17,8 +17,8 @@ namespace AoC2023
          {
             string numbers = line.Split(':')[1];
             (string winning, string mine) = numbers.Split('|'); 
-            var winningNumbers = winning.Trim().Split(' ').Where(s => s.Length > 0).Select(int.Parse).ToArray(); 
-            var myNumbers = mine.Trim().Split(' ').Where(s => s.Length > 0).Select(int.Parse).ToArray(); 
+            var winningNumbers = winning.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray(); 
+            var myNumbers = mine.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray(); 
 
             foreach (int n in winningNumbers) {
                WinningNumbers.Add(n); 
