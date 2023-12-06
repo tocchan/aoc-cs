@@ -24,70 +24,33 @@ namespace AoC2023
          Distances = lines[1].Split(':')[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
       }
 
-      public int DetermineWinners(int ms, int distanceToBeat)
-      {
-         int count = 0; 
-         for (int i = 1; i < ms; ++i) {
-            int distance = (ms - i) * i; 
-            if (distance > distanceToBeat) {
-               ++count; 
-            }
-         }
 
-         return count; 
+      //----------------------------------------------------------------------------------------------
+      public Int64 DetermineWinners(Int64 time, Int64 distance)
+      {
+         (double t0, double t1) = Util.Quadratic(-1.0, time, -distance);
+         t0 = Math.Ceiling(t0);
+         t1 = Math.Floor(t1);
+
+         return (Int64)(t1 - t0) + 1;
       }
 
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         int total = 1; 
+         Int64 total = 1; 
          for (int i = 0; i < Times.Length; ++i) {
             total *= DetermineWinners(Times[i], Distances[i]); 
          }
          return total.ToString(); 
       }
 
-      public Int64 DetermineWinnersSmart(Int64 time, Int64 distance)
-      {
-         // determine first winner
-         Int64 startTime = 1; 
-         Int64 endTime = time; 
-
-         while (startTime < time) {
-            Int64 dist = (time - startTime) * startTime; 
-            if (dist > distance) {
-               break; 
-            }
-            ++startTime; 
-         }
-
-         while (endTime > 1) {
-            Int64 dist = (time - endTime) * endTime;
-            if (dist > distance) {
-               break; 
-            }
-            --endTime; 
-         }
-
-         // determine last winner
-         return (endTime - startTime) + 1; 
-      }
-
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         string timeString = ""; 
-         string distanceString = ""; 
-
-         for (int i = 0; i < Times.Length; ++i) {
-            timeString += Times[i].ToString(); 
-            distanceString += Distances[i].ToString(); 
-         }
-
-         Int64 time = Int64.Parse(timeString); 
-         Int64 distance = Int64.Parse(distanceString); 
-         
-         return DetermineWinnersSmart(time, distance).ToString(); 
+         Int64 time = Int64.Parse(string.Concat(Times.Select(i => i.ToString())));
+         Int64 distance = Int64.Parse(string.Concat(Distances.Select(i => i.ToString())));
+         return DetermineWinners(time, distance).ToString(); 
       }
    }
 }

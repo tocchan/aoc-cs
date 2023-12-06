@@ -123,7 +123,7 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
-      public static (float, float) Quadratic(float a, float b, float c)
+      public static (float, float) QuadraticF(float a, float b, float c)
       {
          float inner = b * b - 4 * a * c;
          if (inner < 0) {
@@ -134,7 +134,22 @@ namespace AoC
          float ansA = (-b - inner) / (2 * a);
          float ansB = (-b + inner) / (2 * a);
 
-         return (ansA, ansB);
+         return (Math.Min(ansA, ansB), Math.Max(ansA, ansB));
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public static (double, double) Quadratic(double a, double b, double c)
+      {
+         double inner = b * b - 4 * a * c;
+         if (inner < 0) {
+            return (double.NaN, double.NaN);
+         }
+
+         inner = Math.Sqrt(inner);
+         double ansA = (-b - inner) / (2 * a);
+         double ansB = (-b + inner) / (2 * a);
+
+         return (Math.Min(ansA, ansB), Math.Max(ansA, ansB));
       }
 
       //----------------------------------------------------------------------------------------------

@@ -74,7 +74,7 @@ namespace AoC2021
             int minVelY = min.y; 
 
             // every possible x velocity that would hit it. 
-            (float x0, float x1) = Util.Quadratic( 1, 1, -2.0f * min.x ); 
+            (float x0, float x1) = Util.QuadraticF( 1, 1, -2.0f * min.x ); 
             int minVelX = (int) Math.Ceiling( Math.Max( x0, x1 ) ); 
             int maxVelX = max.x; 
             
