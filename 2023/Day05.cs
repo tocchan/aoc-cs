@@ -7,87 +7,6 @@ using System.Threading.Tasks;
 
 namespace AoC2023
 {
-   class Range
-   {
-      public Int64 Min; 
-      public Int64 Max; 
-
-      public Range(Int64 min, Int64 max)
-      {
-         Min = min; 
-         Max = max; 
-      }
-
-      public bool IsIntersecting(Range other)
-      {
-         return Math.Max(Min, other.Min) <= Math.Min(Max, other.Max); 
-      }
-
-      public Range Intersect(Range other)
-      {
-         return new Range(Math.Max(Min, other.Min), Math.Min(Max, other.Max)); 
-      }
-
-      public Range Union(Range other)
-      {
-         return new Range(Math.Min(Min, other.Min), Math.Max(Max, other.Max)); 
-      }
-
-      public bool IsValid()
-      {
-         return Max >= Min; 
-      }
-   }
-
-   class DisjointRange
-   {
-      public void RemoveRange(Range r)
-      {
-         for (int i = Ranges.Count - 1; i >= 0; --i) {
-            Range other = Ranges[i]; 
-
-            if (r.IsIntersecting(other)) {
-               Range lh = new Range(other.Min, r.Min - 1); 
-               Range rh = new Range(r.Max + 1, other.Max); 
-
-               Ranges.RemoveAt(i); 
-               if (rh.IsValid()) {
-                  Ranges.Insert(i, rh); 
-               }
-               if (lh.IsValid()) {
-                  Ranges.Insert(i, lh); 
-               }
-            }
-         }
-      }
-
-      public void AddRange(Range r)
-      {
-         int insertIndex = -1; 
-
-         for (int i = 0; i < Ranges.Count; ++i) {
-            Range other = Ranges[i]; 
-            if (r.IsIntersecting(other)) {
-               r = r.Union(other); 
-               if (insertIndex < 0) {
-                  insertIndex = i; 
-               }
-
-               Ranges.RemoveAt(i); 
-               --i; 
-            }
-         }
-
-         if (insertIndex >= 0) {
-            Ranges.Insert(insertIndex, r); 
-         } else {
-            Ranges.Add(new Range(r.Min, r.Max)); 
-         } 
-      }
-
-      public List<Range> Ranges = new List<Range>();   
-   }
-
    class RangeMap
    {
       public RangeMap(string line)
@@ -109,15 +28,15 @@ namespace AoC2023
          return DstStart + (input - SrcStart); 
       }
 
-      public void MapRanges(ref DisjointRange src, ref DisjointRange dst)
+      public void MapRanges(ref DisjointIntRange src, ref DisjointIntRange dst)
       {
-         Range r = new Range(SrcStart, SrcStart + Count - 1);
+         IntRange r = new IntRange(SrcStart, SrcStart + Count - 1);
          
          bool tryAgain = true; 
          while (tryAgain) { 
             tryAgain = false ;
-            foreach (Range srcRange in src.Ranges) {
-               Range intersection = srcRange.Intersect(r); 
+            foreach (IntRange srcRange in src.Ranges) {
+               IntRange intersection = srcRange.GetIntersection(r); 
                if (intersection.IsValid()) {
                   src.RemoveRange(intersection); 
                
@@ -154,7 +73,7 @@ namespace AoC2023
          return input; 
       }
 
-      public void MapRanges(ref DisjointRange src, ref DisjointRange dst)
+      public void MapRanges(ref DisjointIntRange src, ref DisjointIntRange dst)
       {
          foreach (RangeMap rm in Ranges) {
             rm.MapRanges(ref src, ref dst); 
@@ -167,7 +86,6 @@ namespace AoC2023
 
    internal class Day05 : Day
    {
-
       private string InputFile = "2023/inputs/05.txt";
 
       Int64[] Seeds = new Int64[0]; 
@@ -254,18 +172,18 @@ namespace AoC2023
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         DisjointRange src = new DisjointRange(); 
+         DisjointIntRange src = new DisjointIntRange(); 
          for (int i = 0; i < Seeds.Count(); i += 2) {
             Int64 start = Seeds[i]; 
             Int64 count = Seeds[i + 1]; 
-            src.AddRange(new Range(start, start + count - 1)); 
+            src.AddRange(new IntRange(start, start + count - 1)); 
          }
 
          foreach (Mapping mapping in Mappings) {
-            DisjointRange dst = new DisjointRange(); 
+            DisjointIntRange dst = new DisjointIntRange(); 
             mapping.MapRanges(ref src, ref dst); 
 
-            foreach (Range r in src.Ranges) {
+            foreach (IntRange r in src.Ranges) {
                dst.AddRange(r); 
             }
 
@@ -273,7 +191,7 @@ namespace AoC2023
          }
 
          Int64 min = Int64.MaxValue; 
-         foreach (Range r in src.Ranges) {
+         foreach (IntRange r in src.Ranges) {
             min = Math.Min(r.Min, min); 
          }
 

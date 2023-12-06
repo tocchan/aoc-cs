@@ -36,9 +36,9 @@ namespace AoC2022
          }
       }
 
-      public IntSet ComputeSet(int row)
+      public DisjointIntRange ComputeSet(int row)
       {
-         IntSet ranges = new IntSet(); 
+         DisjointIntRange ranges = new DisjointIntRange(); 
          for (int i = 0; i < Sensors.Count; ++i) {
             ivec2 sensor = Sensors[i]; 
             ivec2 beacon = Closest[i]; 
@@ -49,7 +49,7 @@ namespace AoC2022
 
             if (xwidth >= 0) { 
                IntRange range = new IntRange(sensor.x - xwidth, sensor.x + xwidth); 
-               ranges.Add(range); 
+               ranges.AddRange(range); 
             }
          }
 
@@ -61,7 +61,7 @@ namespace AoC2022
       {
          // go through each beacon, figure how many of that beacon lie on my row.  Subtract a count of all unique beacons on that row
          int row = 974977; 
-         IntSet ranges = ComputeSet(row); 
+         DisjointIntRange ranges = ComputeSet(row); 
          
          HashSet<ivec2> rowBeacons = new(); 
          for (int i = 0; i < Sensors.Count; ++i) {
@@ -72,7 +72,7 @@ namespace AoC2022
          }
 
          // count all ranges, but subtract any overlaps
-         int count = ranges.GetCount(); 
+         Int64 count = ranges.GetCount(); 
          count -= rowBeacons.Count; 
 
          return count.ToString(); 
@@ -82,7 +82,7 @@ namespace AoC2022
       public override string RunB()
       {
          for (int y = 0; y < 4000000; ++y) {
-            IntSet ranges = ComputeSet(y); 
+            DisjointIntRange ranges = ComputeSet(y); 
             ranges.SetLowerBound(0); 
             if (ranges.GetRangeCount() > 1) {
                Int64 x = ranges.GetRange(0).Max + 1; 

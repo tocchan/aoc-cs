@@ -10,8 +10,8 @@ namespace AoC
    // Defines an inclusive range between min and max
    internal class IntRange
    {
-      public int Min; 
-      public int Max; 
+      public Int64 Min; 
+      public Int64 Max; 
 
       //----------------------------------------------------------------------------------------------
       public IntRange()
@@ -28,13 +28,13 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
-      public IntRange( int min, int max )
+      public IntRange( Int64 min, Int64 max )
       {
          Min = min; 
          Max = max; 
       }
 
-      public int Count => IsValid() ? (Max - Min) + 1 : 0; 
+      public Int64 Count => IsValid() ? (Max - Min) + 1 : 0; 
 
 
       //----------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ namespace AoC
       // would give an IntRange(Min = 1, Max = 5)
       static public IntRange Parse( string range )
       {
-         (int min, int max) = range.Split('-').Select(int.Parse).ToArray(); 
+         (Int64 min, Int64 max) = range.Split('-').Select(Int64.Parse).ToArray(); 
          return new IntRange( min, max ); 
       }
 
@@ -60,7 +60,7 @@ namespace AoC
          return Max >= Min; 
       }
 
-      public bool Contains( int v ) => ((v >= Min) && (v <= Max));
+      public bool Contains( Int64 v ) => ((v >= Min) && (v <= Max));
 
       //----------------------------------------------------------------------------------------------
       public bool Contains( IntRange other )
