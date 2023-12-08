@@ -318,6 +318,17 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public static Int64 LCM(IEnumerable<Int64> numbers)
+      {
+         Int64 lcm = 1; 
+         foreach (Int64 num in numbers) {
+            lcm = Util.LCM(num, lcm); 
+         }
+
+         return lcm; 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public static bool IsDigit(char c) => (c >= '0') && (c <= '9'); 
 
       public static bool IsLetter(char c) => ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')); 
