@@ -23,52 +23,12 @@ namespace AoC2023
          }
       }
 
-      public Int64 GetNextIn(List<Int64> sequence)
-      {
-         if (sequence.Count == 0) {
-            return 0; 
-         }
-
-         List<Int64> diff = new List<Int64>(); 
-         bool isAllZero = true; 
-         for (int i = 0; i < sequence.Count - 1; ++i) {
-            diff.Add(sequence[i + 1] - sequence[i]); 
-            isAllZero = isAllZero && diff[i] == 0; 
-         }
-
-         if (isAllZero) {
-            return sequence.Last(); 
-         } else {
-            return GetNextIn(diff) + sequence.Last(); 
-         }
-      }
-
-      public Int64 GetPreviousIn(List<Int64> sequence)
-      {
-         if (sequence.Count == 0) {
-            return 0;
-         }
-
-         List<Int64> diff = new List<Int64>();
-         bool isAllZero = true;
-         for (int i = 0; i < sequence.Count - 1; ++i) {
-            diff.Add(sequence[i + 1] - sequence[i]);
-            isAllZero = isAllZero && diff[i] == 0;
-         }
-
-         if (isAllZero) {
-            return sequence.First();
-         } else {
-            return sequence.First() - GetPreviousIn(diff);
-         }
-      }
-
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
          Int64 sum = 0; 
          foreach (var sequence in Sequences) {
-            sum += GetNextIn(sequence); 
+            sum += Util.GetNextIn(sequence); 
          }
          return sum.ToString();  
       }
@@ -78,7 +38,7 @@ namespace AoC2023
       {
          Int64 sum = 0;
          foreach (var sequence in Sequences) {
-            sum += GetPreviousIn(sequence);
+            sum += Util.GetPreviousIn(sequence);
          }
          return sum.ToString();
       }

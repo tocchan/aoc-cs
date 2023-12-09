@@ -329,6 +329,53 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      static private Int64 GetNextInPlace(List<Int64> sequence)
+      {
+         if (sequence.Count == 0) {
+            return 0; 
+         } else if (sequence.Count == 1) {
+            return sequence[0]; 
+         }
+
+         bool isAllZero = false;
+         int diffCount = sequence.Count;
+         while (!isAllZero) {
+            isAllZero = true;
+            --diffCount; // this will leave the last element unaffected
+
+            for (int i = 0; i < diffCount; ++i) {
+               sequence[i] = sequence[i + 1] - sequence[i];
+               isAllZero = isAllZero && (sequence[i] == 0);
+            }
+         }
+
+         Int64 sum = 0;
+         while (diffCount < sequence.Count) {
+            sum += sequence[diffCount];
+            ++diffCount;
+         }
+
+         return sum;
+      }
+
+      //----------------------------------------------------------------------------------------------
+      static public Int64 GetNextIn(IEnumerable<Int64> sequence)
+      {
+         List<Int64> copy = new List<Int64>(); 
+         copy.AddRange(sequence); 
+         return GetNextInPlace(copy); 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      static public Int64 GetPreviousIn(List<Int64> sequence)
+      {
+         List<Int64> copy = new List<Int64>();
+         copy.AddRange(sequence);
+         copy.Reverse(); 
+         return GetNextInPlace(copy);
+      }
+
+      //----------------------------------------------------------------------------------------------
       public static bool IsDigit(char c) => (c >= '0') && (c <= '9'); 
 
       public static bool IsLetter(char c) => ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')); 
