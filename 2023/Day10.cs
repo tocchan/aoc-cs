@@ -39,13 +39,56 @@ namespace AoC2023
       }
 
       //----------------------------------------------------------------------------------------------
+      int DetermineStartTile()
+      {
+         // want to find who is connected to me. 
+         int left = Map[StartPos + ivec2.LEFT]; 
+         int right = Map[StartPos + ivec2.RIGHT]; 
+         int up = Map[StartPos + ivec2.UP]; 
+         int down = Map[StartPos + ivec2.DOWN]; 
+
+         bool leftConnected = (left == 'F') || (left == '-') || (left == 'L'); 
+         bool rightConnected = (right == '7') || (right == '-') || (right == 'J'); 
+         bool topConnected = (up == '|') || (up == 'F') || (up == '7'); 
+         bool botConnected = (down == '|') || (down == 'L') || (down == 'J'); 
+         
+         if (topConnected && botConnected) {
+            return '|'; 
+         } else if (rightConnected && leftConnected) {
+            return '-';
+         } else if (topConnected && rightConnected) {
+            return 'L'; 
+         } else if (topConnected && leftConnected) {
+            return 'J'; 
+         } else if (botConnected && leftConnected) {
+            return '7'; 
+         } else if (botConnected && rightConnected) {
+            return 'F'; 
+         } else {
+            return '.'; 
+         }
+      }
+
+      ivec2 DetermineStartDirection()
+      {
+         return Map[StartPos] switch {
+            '|' => ivec2.UP, 
+            '-' => ivec2.RIGHT, 
+            'F' => ivec2.RIGHT, 
+            'J' => ivec2.UP, 
+            '7' => ivec2.DOWN, 
+            'L' => ivec2.UP, 
+            _ => ivec2.RIGHT
+         };
+      }
+
+      //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         // just looking at the input, know S is a '|', so just set that for now for simplicity
-         Map[StartPos] = '|'; 
+         Map[StartPos] = DetermineStartTile(); 
          
          ivec2 pos = StartPos; 
-         ivec2 dir = ivec2.UP;  // again, now S is a straight, so start going up or down
+         ivec2 dir = DetermineStartDirection();  // again, now S is a straight, so start going up or down
          int length = 0; 
          do {
             FillMap[pos] = 1; 
