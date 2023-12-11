@@ -49,8 +49,6 @@ namespace AoC2023
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         int step = 0; 
-
          string loc = "AAA"; 
          return Solve(loc).ToString(); 
       }

@@ -220,6 +220,36 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public void SetColumn(int column, int value)
+      {
+         if ((column >= 0) && (column < GetWidth())) {
+            for (int y = 0; y < Size.y; ++y) {
+               Set(column, y, value); 
+            }
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public void SetRow(int row, int value)
+      {
+         if ((row >= 0) && (row < GetHeight())) {
+            for (int x = 0; x < Size.x; ++x) {
+               Set(x, row, value);
+            }
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public void ReplaceAll(int search, int replace)
+      {
+         for (int i = 0; i < Data.Length; ++i) {
+            if (Data[i] == search) {
+               Data[i] = replace; 
+            }
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       public int Get(int offset)
       {
          return ((offset >= 0) && (offset < Data.Length)) ? Data[offset] : BoundsValue;
