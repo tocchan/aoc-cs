@@ -13,8 +13,8 @@ namespace AoC2023
    {
       class Lens
       { 
-         public string label; 
-         public int size; 
+         public string label = ""; 
+         public int size = 0; 
       }
 
       LinkedList<Lens> Lenses = new LinkedList<Lens>(); 
@@ -88,13 +88,6 @@ namespace AoC2023
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         /*
-         Determine the ASCII code for the current character of the string.
-         Increase the current value by the ASCII code you just determined.
-         Set the current value to itself multiplied by 17.
-         Set the current value to the remainder of dividing itself by 256.
-         */
-
          int value = 0; 
          foreach (string token in Tokens) { 
             value += Hash(token); 
