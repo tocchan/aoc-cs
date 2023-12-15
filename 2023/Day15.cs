@@ -19,20 +19,9 @@ namespace AoC2023
 
       LinkedList<Lens> Lenses = new LinkedList<Lens>(); 
 
-      LinkedListNode<Lens>? Find(string label)
-      {
-         for (var iter = Lenses.First; iter != null; iter = iter.Next) {
-            if (iter.Value.label == label) {
-               return iter; 
-            }
-         }
-
-         return null; 
-      }
-
       public void AddLens(string label, int size)
       {
-         LinkedListNode<Lens>? iter = Find(label);
+         LinkedListNode<Lens>? iter = Lenses.FindBy((Lens l) => l.label == label); 
          if (iter != null) {
             iter.Value.size = size; 
          } else {
@@ -46,7 +35,7 @@ namespace AoC2023
 
       public void RemoveLens(string label)
       {
-         LinkedListNode<Lens>? iter = Find(label); 
+         LinkedListNode<Lens>? iter = Lenses.FindBy((Lens l) => l.label == label); 
          if (iter != null) {
             Lenses.Remove(iter); 
          }

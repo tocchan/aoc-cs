@@ -86,6 +86,20 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public static LinkedListNode<T>? FindBy<T>(this LinkedList<T> list, Func<T, bool> predicate)
+      {
+         LinkedListNode<T>? iter = list.First; 
+         while (iter != null) {
+            if (predicate(iter.Value)) {
+               return iter; 
+            }
+            iter = iter.Next; 
+         }
+
+         return null; 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public static eDirection Negate( this eDirection d ) => d switch 
       {
          eDirection.Right => eDirection.Left, 
