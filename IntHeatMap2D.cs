@@ -335,6 +335,11 @@ namespace AoC
          return ret;
       }
 
+      public int GetArea()
+      {
+         return Size.Product(); 
+      }
+
       //----------------------------------------------------------------------------------------------
       public int GetWidth() => Size.x;
       public int GetHeight() => Size.y;
