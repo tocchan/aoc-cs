@@ -12,7 +12,7 @@ namespace AoC2023
    {
       private string InputFile = "2023/inputs/17d.txt";
 
-      struct lookup_key
+      struct LookupKey
       {
          public ivec2 pos; 
          public ivec2 dir; 
@@ -24,7 +24,7 @@ namespace AoC2023
                return false;
             }
 
-            lookup_key other = (lookup_key)obj;
+            LookupKey other = (LookupKey)obj;
             return pos == other.pos
                && dir == other.dir
                && step == other.step; 
@@ -36,9 +36,26 @@ namespace AoC2023
          }
       }
 
+      class Move
+      {
+         public Move? prev_move;
+         public LookupKey key; 
+         public int cost; 
+
+         public Move Copy()
+         {
+            Move copy = new Move(); 
+            copy.prev_move = this; 
+            copy.key = key; 
+            copy.cost = cost; 
+            return copy; 
+
+         }
+      }
+
       IntHeatMap2D Map = new IntHeatMap2D(); 
       IntHeatMap2D Visited = new IntHeatMap2D(); 
-      Dictionary<lookup_key,int> Lookup = new Dictionary<lookup_key, int>(); 
+      HashSet<LookupKey> Lookup = new HashSet<LookupKey>(); 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
@@ -48,51 +65,59 @@ namespace AoC2023
       }
 
       //----------------------------------------------------------------------------------------------
-      public int FindBestPath(ivec2 pos, ivec2 dir, int stepsRemaining, ivec2 end)
+      void TryAdd(PriorityQueue<Move, int> moves, Move move)
       {
-         if (!Map.ContainsPoint(pos)) {
-            return int.MaxValue; 
+         move.key.pos += move.key.dir; 
+         if (!Map.ContainsPoint(move.key.pos)) {
+            return; 
          }
 
-         if (Visited[pos] == 1) {
-            return int.MaxValue; 
+         move.cost += Map[move.key.pos]; 
+         moves.Enqueue(move, move.cost); 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      Move FindBestPath(ivec2 pos, ivec2 dir, int stepsRemaining, ivec2 end)
+      {
+         Move firstMove = new Move(); 
+         firstMove.prev_move = null; 
+         firstMove.key.pos = pos; 
+         firstMove.key.dir = dir; 
+         firstMove.key.step = stepsRemaining;
+         firstMove.cost = 0; 
+
+         PriorityQueue<Move, int> moves = new PriorityQueue<Move, int>(); 
+         moves.Enqueue(firstMove, 0); 
+
+         while (moves.Count > 0) {
+            Move move = moves.Dequeue(); 
+            if (Lookup.Contains(move.key)) { 
+               continue; // we've been here with a better move, ignore it. 
+            }
+            Lookup.Add(move.key);
+
+            if (move.key.pos == end) {
+               return move; 
+            }
+
+            if (move.key.step > 0) {
+               Move forward = move.Copy(); ; 
+               forward.key.step--; 
+               TryAdd(moves, forward); 
+            }
+
+            Move right = move.Copy(); 
+            right.key.dir = right.key.dir.GetRotatedRight();
+            right.key.step = 2; 
+            TryAdd(moves, right); 
+
+            Move left = move.Copy(); 
+            left.key.dir = left.key.dir.GetRotatedLeft(); 
+            left.key.step = 2; 
+            TryAdd(moves, left); 
          }
-
-         int heat = Map[pos]; 
-         if (pos == end) {
-            return heat; 
-         }
-
-         lookup_key key; 
-         key.pos = pos; 
-         key.dir = dir; 
-         key.step = stepsRemaining; 
-         if (Lookup.ContainsKey(key)) {
-            return Lookup[key]; 
-         }
-
-         Visited[pos] = 1; 
-
-         int bestNext = int.MaxValue; 
-         if (stepsRemaining > 0) {
-            bestNext = Math.Min(bestNext, FindBestPath(pos + dir, dir, stepsRemaining - 1, end)); 
-         } 
-
-         ivec2 left = dir.GetRotatedLeft(); 
-         ivec2 right = dir.GetRotatedRight(); 
-         int leftBest = FindBestPath(pos + left, left, 2, end); 
-         int bestRight = FindBestPath(pos + right, right, 2, end); 
-
-         bestNext = Math.Min(bestNext, Math.Min(leftBest, bestRight));
-         Visited[pos] = 0;  // other person can try this; 
-
-         if (bestNext == int.MaxValue) {
-            Lookup[key] = int.MaxValue; 
-            return int.MaxValue; 
-         } else {
-            Lookup[key] = heat + bestNext;
-            return heat + bestNext; 
-         }
+            
+         return new Move(); 
       }
 
       // this is A*, but with a slight twist.  So doing it here
@@ -100,10 +125,15 @@ namespace AoC2023
       {
          Visited.Init(Map.GetSize(), 0, int.MaxValue); 
 
-         int option0 = FindBestPath(start, ivec2.RIGHT, 2, end); 
-         int option1 = FindBestPath(start, ivec2.DOWN, 2, end); 
+         Move move = FindBestPath(start, ivec2.RIGHT, 2, end); 
+         
+         Move? iter = move; 
+         while (iter != null) {
+            Util.WriteLine($"{iter.key.pos}: {iter.cost} -> {Map[iter.key.pos]}"); 
+            iter = iter.prev_move; 
+         }
 
-         return Math.Min(option0, option1) - Map[start]; 
+         return move.cost;
       }
 
       //----------------------------------------------------------------------------------------------
