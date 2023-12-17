@@ -95,7 +95,6 @@ namespace AoC2023
       {
          for (int y = 1; y < map.GetHeight(); ++y) {
             int checkSize = Math.Min(y, map.GetHeight() - y);
-            bool isMirrored = true;
             int diffCount = 0; 
             for (int j = 0; j < checkSize; ++j) {
                diffCount += GetRowDiffCount(map, y - j - 1, y + j);
