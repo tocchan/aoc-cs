@@ -12,8 +12,6 @@ namespace AoC2023
    {
       private string InputFile = "2023/inputs/17.txt";
 
-      private int MaxStep = 2;
-
       struct LookupKey
       {
          public ivec2 pos; 
@@ -81,13 +79,15 @@ namespace AoC2023
       }
 
       //----------------------------------------------------------------------------------------------
-      Move FindBestPath(ivec2 pos, ivec2 dir, int stepsRemaining, ivec2 end)
+      Move FindBestPath(ivec2 pos, ivec2 dir, int minStep, int maxStep, ivec2 end)
       {
+         Lookup.Clear(); 
+
          Move firstMove = new Move(); 
          firstMove.prev_move = null; 
          firstMove.key.pos = pos; 
          firstMove.key.dir = dir; 
-         firstMove.key.step = stepsRemaining;
+         firstMove.key.step = maxStep + 1;
          firstMove.cost = 0; 
 
          PriorityQueue<Move, int> moves = new PriorityQueue<Move, int>(); 
@@ -96,9 +96,6 @@ namespace AoC2023
          while (moves.Count > 0) {
             Move move = moves.Dequeue(); 
             if (Lookup.ContainsKey(move.key)) { 
-               if (Lookup[move.key] > move.cost) {
-                  Util.WriteLine("ERROR");  // if we got here, this move would have been cheaper
-               }
                continue; // we've been here with a better move, ignore it. 
             }
             Lookup[move.key] = move.cost; 
@@ -113,34 +110,35 @@ namespace AoC2023
                TryAdd(moves, forward, end); 
             }
 
-            Move right = move.Copy(); 
-            right.key.dir = right.key.dir.GetRotatedRight();
-            right.key.step = MaxStep; 
-            TryAdd(moves, right, end); 
+            int stepsTaken = maxStep - move.key.step + 1; 
+            if (stepsTaken > minStep) { 
+               Move right = move.Copy(); 
+               right.key.dir = right.key.dir.GetRotatedRight();
+               right.key.step = maxStep; 
+               TryAdd(moves, right, end); 
 
-            Move left = move.Copy(); 
-            left.key.dir = left.key.dir.GetRotatedLeft(); 
-            left.key.step = MaxStep; 
-            TryAdd(moves, left, end); 
+               Move left = move.Copy(); 
+               left.key.dir = left.key.dir.GetRotatedLeft(); 
+               left.key.step = maxStep; 
+               TryAdd(moves, left, end); 
+            }
          }
             
          return new Move(); 
       }
 
-      // this is A*, but with a slight twist.  So doing it here
-      public int FindBestPath(ivec2 start, ivec2 end)
+      //----------------------------------------------------------------------------------------------
+      void DrawPath(Move move)
       {
-         Move move = FindBestPath(start, ivec2.RIGHT, MaxStep + 1, end); 
-         
-         string pal = "0123456789^>v<"; 
-         IntCanvas canvas = new IntCanvas(); 
-         canvas.SetSize(Map.GetSize()); 
+         string pal = "0123456789^>v<";
+         IntCanvas canvas = new IntCanvas();
+         canvas.SetSize(Map.GetSize());
 
          foreach ((ivec2 pos, int val) in Map) {
-            canvas.SetValue(pos, val); 
+            canvas.SetValue(pos, val);
          }
 
-         Move? iter = move; 
+         Move? iter = move;
          while (iter != null) {
             if (iter.key.dir == ivec2.UP) {
                canvas.SetValue(iter.key.pos, 10);
@@ -150,27 +148,26 @@ namespace AoC2023
                canvas.SetValue(iter.key.pos, 12);
             } else if (iter.key.dir == ivec2.LEFT) {
                canvas.SetValue(iter.key.pos, 13);
-            } 
+            }
             // Util.WriteLine($"{iter.key.pos}: {Map[iter.key.pos]} -> {iter.cost}"); 
-            iter = iter.prev_move; 
+            iter = iter.prev_move;
          }
 
-         Util.WriteLine(canvas.ToString(pal)); 
-
-         return move.cost;
+         Util.WriteLine(canvas.ToString(pal));
       }
 
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
-         int heatLost = FindBestPath(ivec2.ZERO, Map.GetSize() - ivec2.ONE); 
-         return heatLost.ToString(); 
+         Move move = FindBestPath(ivec2.ZERO, ivec2.RIGHT, 0, 2, Map.GetSize() - 1);
+         return move.cost.ToString(); 
       }
 
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         return ""; 
+         Move move = FindBestPath(ivec2.ZERO, ivec2.RIGHT, 3, 9, Map.GetSize() - 1);
+         return move.cost.ToString();
       }
    }
 }
