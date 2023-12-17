@@ -10,7 +10,9 @@ namespace AoC2023
 {
    internal class Day17 : Day
    {
-      private string InputFile = "2023/inputs/17d.txt";
+      private string InputFile = "2023/inputs/17.txt";
+
+      private int MaxStep = 2;
 
       struct LookupKey
       {
@@ -54,8 +56,7 @@ namespace AoC2023
       }
 
       IntHeatMap2D Map = new IntHeatMap2D(); 
-      IntHeatMap2D Visited = new IntHeatMap2D(); 
-      HashSet<LookupKey> Lookup = new HashSet<LookupKey>(); 
+      Dictionary<LookupKey,int> Lookup = new Dictionary<LookupKey, int>(); 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
@@ -65,15 +66,18 @@ namespace AoC2023
       }
 
       //----------------------------------------------------------------------------------------------
-      void TryAdd(PriorityQueue<Move, int> moves, Move move)
+      void TryAdd(PriorityQueue<Move, int> moves, Move move, ivec2 end)
       {
          move.key.pos += move.key.dir; 
          if (!Map.ContainsPoint(move.key.pos)) {
             return; 
          }
 
+         ivec2 distToEnd = move.key.pos - end; 
+         int hcost = distToEnd.GetManhattanDistance(); 
+
          move.cost += Map[move.key.pos]; 
-         moves.Enqueue(move, move.cost); 
+         moves.Enqueue(move, move.cost + hcost); 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -91,10 +95,13 @@ namespace AoC2023
 
          while (moves.Count > 0) {
             Move move = moves.Dequeue(); 
-            if (Lookup.Contains(move.key)) { 
+            if (Lookup.ContainsKey(move.key)) { 
+               if (Lookup[move.key] > move.cost) {
+                  Util.WriteLine("ERROR");  // if we got here, this move would have been cheaper
+               }
                continue; // we've been here with a better move, ignore it. 
             }
-            Lookup.Add(move.key);
+            Lookup[move.key] = move.cost; 
 
             if (move.key.pos == end) {
                return move; 
@@ -103,18 +110,18 @@ namespace AoC2023
             if (move.key.step > 0) {
                Move forward = move.Copy(); ; 
                forward.key.step--; 
-               TryAdd(moves, forward); 
+               TryAdd(moves, forward, end); 
             }
 
             Move right = move.Copy(); 
             right.key.dir = right.key.dir.GetRotatedRight();
-            right.key.step = 2; 
-            TryAdd(moves, right); 
+            right.key.step = MaxStep; 
+            TryAdd(moves, right, end); 
 
             Move left = move.Copy(); 
             left.key.dir = left.key.dir.GetRotatedLeft(); 
-            left.key.step = 2; 
-            TryAdd(moves, left); 
+            left.key.step = MaxStep; 
+            TryAdd(moves, left, end); 
          }
             
          return new Move(); 
@@ -123,15 +130,32 @@ namespace AoC2023
       // this is A*, but with a slight twist.  So doing it here
       public int FindBestPath(ivec2 start, ivec2 end)
       {
-         Visited.Init(Map.GetSize(), 0, int.MaxValue); 
-
-         Move move = FindBestPath(start, ivec2.RIGHT, 2, end); 
+         Move move = FindBestPath(start, ivec2.RIGHT, MaxStep + 1, end); 
          
+         string pal = "0123456789^>v<"; 
+         IntCanvas canvas = new IntCanvas(); 
+         canvas.SetSize(Map.GetSize()); 
+
+         foreach ((ivec2 pos, int val) in Map) {
+            canvas.SetValue(pos, val); 
+         }
+
          Move? iter = move; 
          while (iter != null) {
-            Util.WriteLine($"{iter.key.pos}: {iter.cost} -> {Map[iter.key.pos]}"); 
+            if (iter.key.dir == ivec2.UP) {
+               canvas.SetValue(iter.key.pos, 10);
+            } else if (iter.key.dir == ivec2.RIGHT) {
+               canvas.SetValue(iter.key.pos, 11);
+            } else if (iter.key.dir == ivec2.DOWN) {
+               canvas.SetValue(iter.key.pos, 12);
+            } else if (iter.key.dir == ivec2.LEFT) {
+               canvas.SetValue(iter.key.pos, 13);
+            } 
+            // Util.WriteLine($"{iter.key.pos}: {Map[iter.key.pos]} -> {iter.cost}"); 
             iter = iter.prev_move; 
          }
+
+         Util.WriteLine(canvas.ToString(pal)); 
 
          return move.cost;
       }
