@@ -63,127 +63,6 @@ namespace AoC2023
       }
 
       //----------------------------------------------------------------------------------------------
-      private int FindNextHit(ivec2 start, ivec2 end, List<ivec2> poly)
-      {
-         start.x++; // we will ignore hits at the start
-
-         int hitWall = -1; 
-         int leftMost = int.MaxValue; 
-
-         for (int i = 1; i < poly.Count; ++i) {
-            ivec2 p0 = poly[i -  1]; 
-            ivec2 p1 = poly[i]; 
-            int dx = (p1.x - p0.x); 
-
-            // runs horizontal - doesn't factor into this problem
-            if (dx != 0) {
-               continue; 
-            }
-
-            if ((start.x > p0.x) || (end.x < p0.x)) { // doesn't cross
-               continue; 
-            }
-
-            // swap, so it is always min to max
-            int minY = Math.Min(p0.y, p1.y); 
-            int maxY = Math.Max(p0.y, p1.y); 
-
-            // doesn't cross
-            if ((start.y < minY) || (start.y > maxY)) {
-               continue; 
-            }
-
-            // okay, it hits
-            if (p0.x < leftMost) {
-               leftMost = p0.x; 
-               hitWall = i; 
-            }
-         }
-
-
-         return hitWall; 
-      }
-
-      //----------------------------------------------------------------------------------------------
-      private int FollowEdges(ivec2 pos, List<ivec2> poly)
-      {
-         for (int i = 1; i < poly.Count; ++i) {
-            if (poly[i].y != pos.y) {
-               continue; 
-            }
-
-            int x0 = poly[i].x; 
-            int x1 = poly[i - 1].x; 
-            int sx = Math.Min(x0, x1); 
-            int ex = Math.Max(x0, x1); 
-
-            if ((ex > sx) && (sx == pos.x)) {
-               return ex - 1; // move along to JUST before the end
-            }
-         }
-
-         return pos.x; // no movement
-      }
-
-      //----------------------------------------------------------------------------------------------
-      private Int64 CountInterior(ivec2 start, ivec2 end, List<ivec2> poly)
-      {
-         Int64 count = 0; 
-
-         bool wasInside = false; 
-         
-         while (true) {
-            int wall = FindNextHit(start, end, poly);
-            if (wall != -1) { 
-               // I know the poly is clockwise, so if we're crossing a line
-               // that is going up, we're inside, otherwise outside
-               int dir = poly[wall].y - poly[wall - 1].y; 
-               bool inside = dir < 0;
-               if (!inside && wasInside) {
-                  count += (poly[wall].x - start.x - 1); // exclude walls
-               }
-
-               wasInside = inside;
-               start.x = poly[wall].x; // move line to start on this wall
-
-               if (inside) {
-                  // if we're along any horizontal edges, follow it
-                  start.x = FollowEdges(start, poly); 
-               }
-            } else {
-               break; 
-            }
-         } 
-
-         return count; 
-      }
-
-      //----------------------------------------------------------------------------------------------
-      public Int64 CountInterior(List<ivec2> poly)
-      {
-         Int64 interior = 0; 
-
-         ivec2 min = poly[0]; 
-         ivec2 max = poly[0]; 
-         foreach (ivec2 point in poly) {
-            min = ivec2.Min(min, point); 
-            max = ivec2.Max(max, point); 
-         }
-
-         for (int y = min.y + 1; y < max.y; ++y) {
-            ivec2 start = new ivec2(min.x - 1, y); 
-            ivec2 end = new ivec2(max.x + 1, y); 
-
-            Int64 lineCount = CountInterior(start, end, poly);
-            interior += lineCount; 
-
-            // Util.WriteLine($"Line {y} has {lineCount}.  Total: {interior}"); 
-         }
-
-         return interior; 
-      }
-
-      //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
          IntCanvas dirt = new IntCanvas(1);
@@ -206,6 +85,7 @@ namespace AoC2023
          return space.ToString();
       }
 
+      //----------------------------------------------------------------------------------------------
       public void JoinEdges(List<ivec2> poly)
       {
          // each poly starts at a corner
@@ -225,6 +105,7 @@ namespace AoC2023
          }
       }
 
+      //----------------------------------------------------------------------------------------------
       (int, ivec2) Raycast(List<ivec2> poly, int startCorner, ivec2 dir)
       {
          ivec2 start = poly[startCorner];
@@ -264,12 +145,15 @@ namespace AoC2023
          return (bestEdge, bestHit);  // should not hit
       }
 
+      //----------------------------------------------------------------------------------------------
       (List<ivec2>, List<ivec2>?, Int64) ClipPolygon(List<ivec2> poly)
       {
          // look for a left turn
-         for (int i = 1; i < poly.Count - 1; ++i) {
-            ivec2 d0 = ivec2.Sign(poly[i] - poly[i - 1]); 
-            ivec2 d1 = poly[i + 1] - poly[i - 1]; 
+         for (int i = 0; i < poly.Count; ++i) {
+            int nextIdx = (i + 1) % poly.Count; 
+            int prevIdx = (i > 0) ? (i - 1) : (poly.Count - 2); 
+            ivec2 d0 = ivec2.Sign(poly[i] - poly[prevIdx]); 
+            ivec2 d1 = poly[nextIdx] - poly[i]; 
             
             ivec2 leftTurn = d0.GetRotatedLeft(); 
             int leftValue = leftTurn.Dot(d1); 
@@ -318,6 +202,7 @@ namespace AoC2023
          return (poly, null, 0); 
       }
 
+      //----------------------------------------------------------------------------------------------
       void Validate(List<ivec2> poly)
       {
          for (int i = 1; i < poly.Count; ++i) {
@@ -327,6 +212,7 @@ namespace AoC2023
          }
       }
 
+      //----------------------------------------------------------------------------------------------
       public Int64 GetSquareVolume(List<ivec2> poly)
       {
          // Validate(poly); 
@@ -340,6 +226,7 @@ namespace AoC2023
 
          Int64 width = Math.Abs(max.x - min.x) + 1;
          Int64 height = Math.Abs(max.y - min.y) + 1; 
+
          return width * height; 
       }
 
