@@ -112,9 +112,9 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
-      public static int Mod( int lh, int rh )
+      public static Int64 Mod( Int64 lh, Int64 rh )
       {
-         int r = lh % rh; 
+         Int64 r = lh % rh; 
          if (r < 0) {
             return r + rh; 
          } else {

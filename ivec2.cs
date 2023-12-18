@@ -145,8 +145,8 @@ namespace AoC
          return ret;
       }
 
-      public static ivec2 Mod(ivec2 val, ivec2 den) => new ivec2( Util.Mod(val.x, den.x), Util.Mod(val.y, den.y) ); 
-      public static ivec2 Mod(ivec2 val, int den) => new ivec2( Util.Mod(val.x, den), Util.Mod(val.y, den) ); 
+      public static ivec2 Mod(ivec2 val, ivec2 den) => new ivec2( (int) Util.Mod(val.x, den.x), (int) Util.Mod(val.y, den.y) ); 
+      public static ivec2 Mod(ivec2 val, int den) => new ivec2( (int) Util.Mod(val.x, den), (int) Util.Mod(val.y, den) ); 
 
       public static ivec2 FloorToBoundary(ivec2 val, int boundary)
       {

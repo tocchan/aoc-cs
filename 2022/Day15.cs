@@ -85,7 +85,7 @@ namespace AoC2022
             DisjointIntRange ranges = ComputeSet(y); 
             ranges.SetLowerBound(0); 
             if (ranges.GetRangeCount() > 1) {
-               Int64 x = ranges.GetRange(0).Max + 1; 
+               Int64 x = ranges.GetRange(0)!.Max + 1; 
                Int64 freq = x; 
                freq = freq * 4000000 + (Int64)y; 
                return freq.ToString(); 

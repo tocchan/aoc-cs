@@ -72,7 +72,7 @@ namespace AoC2023
          }
 
          ivec2 distToEnd = move.key.pos - end; 
-         int hcost = distToEnd.GetManhattanDistance(); 
+         int hcost = (int) distToEnd.GetManhattanDistance(); 
 
          move.cost += Map[move.key.pos]; 
          moves.Enqueue(move, move.cost + hcost); 

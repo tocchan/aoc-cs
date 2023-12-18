@@ -51,7 +51,7 @@ namespace AoC2023
          int points = 0;
          foreach ((ivec2 pos, int val) in map) {
             if (val == 2) {
-               points += (height - pos.y);
+               points += (int)(height - pos.y);
             }
          }
 

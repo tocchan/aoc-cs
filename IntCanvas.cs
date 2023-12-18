@@ -66,6 +66,11 @@ namespace AoC
       {
       }
 
+      public IntCanvas(int defaultValue)
+      {
+         DefaultValue = defaultValue; 
+      }
+
       //----------------------------------------------------------------------------------------------
       public IntCanvas(IntCanvas toCopy)
       {
@@ -396,6 +401,34 @@ namespace AoC
          }
 
          return sb.ToString();
+      }
+
+      public void FloodFill(ivec2 pos, int value)
+      {
+         int oldValue = GetValue(pos); 
+         if (oldValue == value) {
+            return; 
+         }
+
+         Queue<ivec2> points = new Queue<ivec2>(); 
+         points.Enqueue(pos);
+         SetValue(pos, value); 
+
+         while (points.Count > 0) {
+            ivec2 point = points.Dequeue();
+            SetValue(point, value); 
+
+            foreach (ivec2 dir in ivec2.DIRECTIONS) {
+               ivec2 next = point + dir;
+               if (IsInBounds(next)) { 
+                  int tile = GetValue(next);
+                  if (tile == oldValue) {
+                     SetValue(next, value); 
+                     points.Enqueue(next);
+                  }
+               }
+            }
+         }
       }
 
       //----------------------------------------------------------------------------------------------
