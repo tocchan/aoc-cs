@@ -10,12 +10,29 @@ namespace AoC2023
    internal class DayTemplate : Day
    {
       private string InputFile = "2023/inputs/01.txt";
-      
+
+
+      //----------------------------------------------------------------------------------------------
+      //----------------------------------------------------------------------------------------------
+      class Input
+      {
+         public Input(string line)
+         {
+
+         }
+      }
+
+      private List<Input> Inputs = new(); 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
       {
          List<string> lines = Util.ReadFileToLines(InputFile);
+
+         foreach (string line in lines) {
+            Input input = new Input(line); 
+            Inputs.Add(input); 
+         }
       }
 
       //----------------------------------------------------------------------------------------------
