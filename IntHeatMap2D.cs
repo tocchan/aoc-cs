@@ -268,6 +268,28 @@ namespace AoC
       public int Get(ivec2 p) => Get(p.x, p.y);
 
       //----------------------------------------------------------------------------------------------
+      public int[] GetRow(int row)
+      {
+         int[] ret = new int[GetWidth()]; 
+         for (int i = 0; i < GetWidth(); ++i) {
+            ret[i] = Get(i, row); 
+         }
+
+         return ret; 
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public int[] GetColumn(int column)
+      {
+         int[] ret = new int[GetHeight()];
+         for (int i = 0; i < GetHeight(); ++i) {
+            ret[i] = Get(i, column);
+         }
+
+         return ret;
+      }
+
+      //----------------------------------------------------------------------------------------------
       IEnumerator IEnumerable.GetEnumerator()
       {
          throw new NotImplementedException();

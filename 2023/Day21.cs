@@ -77,17 +77,18 @@ namespace AoC2023
          }
       }
 
-      Int64 CornersCounted = 0; 
-      Int64 CardinalCounted = 0; 
-      Int64 SpecialCorners = 0; 
-      Int64 EdgeCount = 0; 
-
-      Int64 CountQuadrant(ivec2 c0, ivec2 c1, int cost0, int cost1, int stepsRemaining)
+      Int64 CountQuadrant(ivec2 c0, ivec2 c1, int[] edgeCosts, int stepsRemaining)
       {
-         SpecialCorners = 0; 
+         int minEdgeCost = edgeCosts.Min(); 
 
-         int minCost = Math.Min(cost0, cost1); 
-         int cornerOffset = cost0 - minCost + 1;  
+         List<ivec2> edgePoints = new(); 
+         ivec2 d = ivec2.Sign(c1 - c0); 
+         for (ivec2 p = c0; p != c1; p += d) {
+            edgePoints.Add(p); 
+         }
+         edgePoints.Add(c1); 
+
+         int cornerOffset = edgeCosts[0] - minEdgeCost + 1;  
 
          // todo, passing in costs was because sample input had different corner costs
          // real input though doesn't matter
@@ -95,44 +96,41 @@ namespace AoC2023
          int width = Map.GetWidth(); 
          int bigNumber = int.MaxValue / 2; 
 
-         Cache edge = new Cache(Map, new ivec2[] { c0, c1 }, new int[] { bigNumber + cost0, bigNumber + cost1});
+         Cache edge = new Cache(Map, edgePoints.ToArray(), edgeCosts.ToArray());
          Cache corner = new Cache(Map, new ivec2[] { c1 }, new int[] { bigNumber }); 
 
-         /*
-         Util.WriteLine("-----------------------------------------------"); 
-         Util.WriteLine(rightPlot.FillMap.ToString());
-         Util.WriteLine("-----------------------------------------------");
-         Util.WriteLine(corner.FillMap.ToString());
-         */
+         // Util.WriteLine("-----------------------------------------------"); 
+         // Util.WriteLine(edge.FillMap.ToString());
+         // Util.WriteLine("-----------------------------------------------");
+         // Util.WriteLine(corner.FillMap.ToString());
 
-         int counter = stepsRemaining - minCost - 1; 
+         int counter = stepsRemaining - minEdgeCost - 1; 
          Int64 tiles = 0;
          while (counter >= 0) {
             ++tiles;
-            ++CardinalCounted; 
 
+            // bug should be here, but the sum of all these counts doesn't
+            // even add up to the error... :confused:  
             int parity = counter % 2; 
             if (counter >= edge.MaxCount) {
-               plots += edge.GetCount(parity); 
+               plots += edge.GetCount(parity); // bug isn't here, multiple would cause it to be way off
             } else {
+               // sobug 
                Int64 edgePlots = edge.GetCount(parity, counter);
-               Util.WriteLine($"edge: {edgePlots}, {15004 - edgePlots}"); 
-
                plots += edgePlots; 
-               EdgeCount += edgePlots; 
+               Util.WriteLine($"edge: {edgePlots}, {15004 - edgePlots}"); 
             }
 
+            // don't think the bug is here
+            // if anything was even off by 1, I'd be wrong in the millions
             int cornerSteps = counter - cornerOffset; 
             int cornerParity = cornerSteps % 2; 
             if (cornerSteps >= corner.MaxCount) {
                plots += corner.GetCount(cornerParity) * (tiles); // count diagonal (startin above me, counting back)
-               CornersCounted += tiles; 
             } else if (cornerSteps >= 0) { 
                Int64 cornerPlots = corner.GetCount(cornerParity, cornerSteps); 
-               Util.WriteLine($"corner: {cornerPlots}, {15004 - cornerPlots}"); 
+               Util.WriteLine($"corner: {cornerPlots} * {tiles} : {15004 - cornerPlots}"); 
                plots += cornerPlots * tiles; 
-               CornersCounted += tiles; 
-               SpecialCorners += cornerPlots; 
             }
 
             counter -= width;
@@ -160,20 +158,19 @@ namespace AoC2023
          ivec2 bl = new ivec2(0, height - 1); 
          ivec2 br = new ivec2(width - 1, height - 1); 
 
-         int tlCost = center.FillMap[tl]; 
-         int trCost = center.FillMap[tr]; 
-         int blCost = center.FillMap[bl]; 
-         int brCost = center.FillMap[br]; 
-         // odd, all the same.  Makes life easier...
-         
          int parity = stepCount % 2; 
-         Int64 plots = center.GetCount(parity);  
+         Int64 plots = center.GetCount(parity);
+
+         int[] rightEdge = center.FillMap.GetColumn(130);
+         int[] topEdge = center.FillMap.GetRow(0);
+         int[] leftEdge = center.FillMap.GetColumn(0);
+         int[] bottomEdge = center.FillMap.GetRow(130);
 
          // okay, now count the four quadrants, let's start to the right
-         plots += CountQuadrant(tl, bl, trCost, brCost, stepCount); // right
-         plots += CountQuadrant(bl, br, tlCost, trCost, stepCount); // up
-         plots += CountQuadrant(br, tr, blCost, tlCost, stepCount); // left
-         plots += CountQuadrant(tr, tl, brCost, blCost, stepCount); // down
+         plots += CountQuadrant(tl, bl, leftEdge, stepCount); // right
+         plots += CountQuadrant(bl, br, topEdge, stepCount); // up
+         plots += CountQuadrant(tr, br, leftEdge, stepCount); // left
+         plots += CountQuadrant(tl, tr, bottomEdge, stepCount); // down
 
          Int64 answer = 622926941971282; 
          Int64 diff = answer - plots; 
