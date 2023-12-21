@@ -77,9 +77,12 @@ namespace AoC2023
          }
       }
 
-      Int64 CountQuadrant(ivec2 c0, ivec2 c1, int[] edgeCosts, int stepsRemaining)
+      Int64 CountQuadrant(ivec2 c0, ivec2 c1, ivec2 cornerStart, int[] edgeCosts, int stepsRemaining)
       {
          int minEdgeCost = edgeCosts.Min(); 
+
+         Int64 cardinalCount = 0; 
+         Int64 cornerCount = 0; 
 
          List<ivec2> edgePoints = new(); 
          ivec2 d = ivec2.Sign(c1 - c0); 
@@ -88,16 +91,16 @@ namespace AoC2023
          }
          edgePoints.Add(c1); 
 
-         int cornerOffset = edgeCosts[0] - minEdgeCost + 1;  
+         int cornerOffset = (cornerStart == c0) ? edgeCosts[0] : edgeCosts.Last(); 
+         cornerOffset = cornerOffset - minEdgeCost + 1;  
 
          // todo, passing in costs was because sample input had different corner costs
          // real input though doesn't matter
-         Int64 plots = 0; 
          int width = Map.GetWidth(); 
          int bigNumber = int.MaxValue / 2; 
 
          Cache edge = new Cache(Map, edgePoints.ToArray(), edgeCosts.ToArray());
-         Cache corner = new Cache(Map, new ivec2[] { c1 }, new int[] { bigNumber }); 
+         Cache corner = new Cache(Map, new ivec2[] { cornerStart }, new int[] { bigNumber }); 
 
          // Util.WriteLine("-----------------------------------------------"); 
          // Util.WriteLine(edge.FillMap.ToString());
@@ -113,12 +116,12 @@ namespace AoC2023
             // even add up to the error... :confused:  
             int parity = counter % 2; 
             if (counter >= edge.MaxCount) {
-               plots += edge.GetCount(parity); // bug isn't here, multiple would cause it to be way off
+               cardinalCount += edge.GetCount(parity); // bug isn't here, multiple would cause it to be way off
+            
             } else {
-               // sobug 
                Int64 edgePlots = edge.GetCount(parity, counter);
-               plots += edgePlots; 
-               Util.WriteLine($"edge: {edgePlots}, {15004 - edgePlots}"); 
+               cardinalCount += edgePlots; 
+               // Util.WriteLine($"edge: {edgePlots}, {15004 - edgePlots}"); 
             }
 
             // don't think the bug is here
@@ -126,17 +129,18 @@ namespace AoC2023
             int cornerSteps = counter - cornerOffset; 
             int cornerParity = cornerSteps % 2; 
             if (cornerSteps >= corner.MaxCount) {
-               plots += corner.GetCount(cornerParity) * (tiles); // count diagonal (startin above me, counting back)
+               cornerCount += corner.GetCount(cornerParity) * (tiles); // count diagonal (startin above me, counting back)
             } else if (cornerSteps >= 0) { 
                Int64 cornerPlots = corner.GetCount(cornerParity, cornerSteps); 
-               Util.WriteLine($"corner: {cornerPlots} * {tiles} : {15004 - cornerPlots}"); 
-               plots += cornerPlots * tiles; 
+               // Util.WriteLine($"corner: {cornerPlots} * {tiles} : {15004 - cornerPlots}"); 
+               cornerCount += cornerPlots * tiles; 
             }
 
             counter -= width;
          }
 
-         return plots; 
+         Util.WriteLine($"c:{cardinalCount}, d:{cornerCount}"); 
+         return cardinalCount + cornerCount; 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -167,10 +171,10 @@ namespace AoC2023
          int[] bottomEdge = center.FillMap.GetRow(130);
 
          // okay, now count the four quadrants, let's start to the right
-         plots += CountQuadrant(tl, bl, leftEdge, stepCount); // right
-         plots += CountQuadrant(bl, br, topEdge, stepCount); // up
-         plots += CountQuadrant(tr, br, leftEdge, stepCount); // left
-         plots += CountQuadrant(tl, tr, bottomEdge, stepCount); // down
+         plots += CountQuadrant(tl, bl, bl, leftEdge, stepCount); // right
+         plots += CountQuadrant(bl, br, br, topEdge, stepCount); // up
+         plots += CountQuadrant(tr, br, tr, leftEdge, stepCount); // left
+         plots += CountQuadrant(tl, tr, tl, bottomEdge, stepCount); // down
 
          Int64 answer = 622926941971282; 
          Int64 diff = answer - plots; 
