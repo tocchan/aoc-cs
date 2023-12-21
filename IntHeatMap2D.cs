@@ -454,53 +454,72 @@ namespace AoC
          return path;
       }
 
-      
       //----------------------------------------------------------------------------------------------
       // returns a heat map with the cost it takes to get to the end
       // cost function is the cost it takes to go from one tile to another (going _toward_ the 
       // end point provided).  Returning -1 means nont possible.
-      public IntHeatMap2D DijkstraFlood(ivec2 end, Func<ivec2,ivec2,int> cost, out int[] paths) 
+      public IntHeatMap2D DijkstraFlood(ivec2[] ends, int[] initialCosts, Func<ivec2, ivec2, int> cost, out int[] paths, int maxDistance = -1)
       {
          PriorityQueue<ivec2, int> points = new PriorityQueue<ivec2, int>();
-         BitArray visited = new BitArray(Size.x * Size.y); 
+         BitArray visited = new BitArray(Size.x * Size.y);
          IntHeatMap2D costs = new IntHeatMap2D(Size, int.MaxValue, int.MaxValue);
-         paths = new int[Size.x * Size.y]; 
-         paths.SetAll(-1); 
+         paths = new int[Size.x * Size.y];
+         paths.SetAll(-1);
 
-         int srcIdx = GetIndex(end); 
-         costs[srcIdx] = 0;
+         for (int i = 0; i < ends.Length; ++i) { 
+            ivec2 end = ends[i]; 
+            int initCost = initialCosts[i]; 
+
+            int srcIdx = GetIndex(end);
+            costs[srcIdx] = initCost; 
+            points.Enqueue(end, Get(end));
+         }
 
          // start algorithm from the end
-         points.Enqueue(end, Get(end));
          while (points.Count > 0) {
             ivec2 src = points.Dequeue();
-            srcIdx = GetIndex(src); 
+            int srcIdx = GetIndex(src);
 
             // only count first person to get here; 
             if (visited[srcIdx]) {
                continue; // already visited, leave
             }
-            visited[srcIdx] = true; 
+            visited[srcIdx] = true;
 
             int srcCost = costs[srcIdx];
             foreach (ivec2 dir in ivec2.DIRECTIONS) {
                ivec2 dst = src + dir;
                if (!ContainsPoint(dst)) {
-                  continue; 
+                  continue;
                }
 
                int dstIdx = GetIndex(dst);
-               int dstCost = cost(dst, src); 
+               int dstCost = cost(dst, src);
+               if (dstCost < 0) {
+                  continue;
+               }
+
                int newCost = dstCost + srcCost;
                if ((dstCost >= 0) && (newCost < costs[dstIdx])) {
                   costs[dstIdx] = newCost;
-                  paths[dstIdx] = srcIdx; 
+                  paths[dstIdx] = srcIdx;
                   points.Enqueue(dst, newCost);
                }
             }
          }
 
-         return costs;         
+         return costs;
+      }
+
+
+      public IntHeatMap2D DijkstraFlood(ivec2 end, Func<ivec2,ivec2,int> cost, out int[] paths, int maxDistance = -1) 
+      {
+         ivec2[] ends = new ivec2[1];
+         int[] costs = new int[1]; 
+         ends[0] = end; 
+         costs[0] = 0; 
+
+         return DijkstraFlood(ends, costs, cost, out paths, maxDistance); 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -561,6 +580,19 @@ namespace AoC
          }
 
          return count;
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public int Count(Func<int, bool> func)
+      {
+         int count = 0; 
+         for (int i = 0; i < Data.Length; ++i) {
+            if (func(Data[i])) {
+               ++count; 
+            }
+         }
+
+         return count; 
       }
 
       //----------------------------------------------------------------------------------------------
