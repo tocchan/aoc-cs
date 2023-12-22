@@ -387,6 +387,28 @@ namespace AoC
          get => Get(offset);
          set => Set(offset, value);
       }
+      
+      //----------------------------------------------------------------------------------------------
+      public int GetMaxIn(iaabb2 area)
+      {
+         int maxValue = int.MinValue; 
+         for (int y = area.MinInclusive.y; y <= area.MaxInclusive.y; ++y) {
+            for (int x = area.MinInclusive.x; x <= area.MaxInclusive.x; ++x) {
+               maxValue = Math.Max(maxValue, Get(x, y)); 
+            }
+         }
+
+         return maxValue; 
+      }
+
+      public void SetArea(iaabb2 area, int value)
+      {
+         for (int y = area.MinInclusive.y; y <= area.MaxInclusive.y; ++y) {
+            for (int x = area.MinInclusive.x; x <= area.MaxInclusive.x; ++x) {
+               Set(x, y, value); 
+            }
+         }
+      }
 
       //----------------------------------------------------------------------------------------------
       // Runs a function on the map, returning the new value for each cell.
