@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace AoC
 {
-
    public enum eDirection
    {
       Right = 0, 
