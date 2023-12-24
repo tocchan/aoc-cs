@@ -14,8 +14,8 @@ namespace AoC
         public vec2 end = vec2.ZERO;
 
         public vec2 direction = vec2.RIGHT; 
-        public float distance = 0.0f; 
-        public float idistance = float.PositiveInfinity; 
+        public double distance = 0.0f; 
+        public double idistance = double.PositiveInfinity; 
 
         public line2() { }
 
@@ -26,7 +26,7 @@ namespace AoC
 
             if (start != end) {
                 distance = (b - a).GetLength(); 
-                idistance = 1.0f / distance; 
+                idistance = 1.0 / distance; 
                 direction = (b - a) * idistance; 
             }
         }
@@ -36,19 +36,19 @@ namespace AoC
             vec2 disp = point - start; 
 
             // project onto the line
-            float dist = disp.Dot(direction); 
+            double dist = disp.Dot(direction); 
             dist = Math.Clamp(dist, 0, distance); 
 
             return start + dist * direction;
         }
 
-        public float GetDistanceTo(vec2 point)
+        public double GetDistanceTo(vec2 point)
         { 
             vec2 p = GetNearestPointTo(point); 
             return (p - point).GetLength(); 
         }
 
-        public bool IsTouching(vec2 point, float epsilon = float.Epsilon)
+        public bool IsTouching(vec2 point, double epsilon = double.Epsilon)
         {
             vec2 p = GetNearestPointTo(point); 
             return point.IsNear(p, epsilon); 

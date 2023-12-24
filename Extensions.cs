@@ -99,6 +99,11 @@ namespace AoC
          return null; 
       }
 
+      public static bool IsNear(this double value, double other, double epsilon = 1.0 / 16777216.0)
+      {
+         return Math.Abs(other - value) < epsilon; 
+      }
+
       //----------------------------------------------------------------------------------------------
       public static eDirection Negate( this eDirection d ) => d switch 
       {
