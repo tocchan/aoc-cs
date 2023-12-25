@@ -237,9 +237,11 @@ namespace AoC2023
 
          // assume the most likely edges are connected to the nodes most frequently hit
          var sorted = Frequency.OrderBy(item => -item.Value).ToArray(); 
+         /*
          foreach (var item in sorted) {
             Util.WriteLine($"{item.Key} showed up {item.Value} times."); 
          }
+         */
 
          List<string> toRemove = sorted.Where(item => item.Value > 100).Select(item => item.Key).ToList(); 
          (int a, int b) = RemoveWire(toRemove, 3); 
