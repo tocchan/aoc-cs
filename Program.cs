@@ -1,15 +1,15 @@
 ﻿using AoC; 
 
-Day? day = Day.Create( "2023", args.FirstOrDefault(), typeof(AoC2023.Day25) );
+Day? day = Day.Create( "2024", args.FirstOrDefault(), typeof(AoC2024.Day01) );
 
 
-Util.WriteLine( @"[+white]                       /)"); 
-Util.WriteLine( @"[+white]              /\___/\ (("); 
-Util.WriteLine( @"[+white]              \`[yellow]@[-]_[yellow]@[+white]'/  ))"); 
-Util.WriteLine( @"[+white]              {_:Y:.}_//" ); 
-Util.WriteLine( @"[+white]    ----------{_}^-'{_}----------"); 
-Util.WriteLine( @"[  cyan]           AoC.2023." + day.GetType().Name    ); 
-Util.WriteLine(  "[+white]    -----------------------------\n" ); 
+Util.WriteLine(""); 
+Util.WriteLine("[blue]_._     _,-'\"\"`-._"); 
+Util.WriteLine("[blue],-.`._,'(       |\\`-/|"); 
+Util.WriteLine("[blue]   `-.-' \\ )-`( , [yellow]o o[-])"); 
+Util.WriteLine("[white]---------[blue]`-    \\`_`\"'- [+white]AoC.2024." + day.GetType().Name + " [white]---------"); 
+Util.WriteLine(""); 
+
 
 string answerA; 
 string answerB; 
