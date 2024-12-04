@@ -18,6 +18,12 @@ namespace AoC
 
       public IntMap( string shape )
       {
+         SetupBinary(shape);          
+      }
+
+      // int map will be either 1 or 0 depending if there is a non-space or space.
+      public void SetupBinary(string shape) 
+      {
          string[] lines = shape.Split('\n'); 
          Size = new ivec2(lines[0].Length, lines.Length); 
          Data = new int[Size.Product()]; 
@@ -27,6 +33,23 @@ namespace AoC
             int x = 0; 
             foreach (char c in line) {
                Set(x, y, c == ' ' ? 0 : 1); 
+               ++x; 
+            }
+            ++y; 
+         }
+      }
+
+      public void SetupWithValues(string shape) 
+      {
+         string[] lines = shape.Split('\n'); 
+         Size = new ivec2(lines[0].Length, lines.Length); 
+         Data = new int[Size.Product()]; 
+         
+         int y = 0;
+         foreach (string line in lines) {
+            int x = 0; 
+            foreach (char c in line) {
+               Set(x, y, c); 
                ++x; 
             }
             ++y; 
@@ -43,6 +66,26 @@ namespace AoC
       public void Set( int x, int y, int v ) => Data[GetIndex(x, y)] = v; 
       public int Get( ivec2 p ) => Data[GetIndex(p)]; 
       public int Get( int x, int y ) => Data[GetIndex(x, y)]; 
+
+      public bool InBounds(int x, int y) 
+      {
+         return (x >= 0) && (x < Width)
+            && (y >= 0) && (y < Height); 
+      }
+
+      public int? TryGet( int x, int y ) 
+      {
+         if (InBounds(x, y)) 
+         {
+            return Get(x, y); 
+         }
+         else 
+         {
+            return null; 
+         }
+      }
+
+      public int? TryGet( ivec2 pos ) { return TryGet(pos.x, pos.y); }
    }
 
    //----------------------------------------------------------------------------------------------
