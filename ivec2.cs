@@ -83,6 +83,17 @@ namespace AoC
       
       public int GetManhattanDistance() => Abs(this).Sum();
 
+      public int GetDirectionBit() 
+      {
+         for (int i = 0; i < CARDINAL.Length; ++i) {
+            if (CARDINAL[i] == this) {
+               return i; 
+            }
+         }
+
+         return CARDINAL.Length; // anything non cardinal we'll just use the last bit for
+      }
+
       public ivec2 GetBestDirectionTo(ivec2 p)
       {
          ivec2 diff = p - this;  

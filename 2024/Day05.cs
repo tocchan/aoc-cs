@@ -58,7 +58,6 @@ namespace AoC2024
 
       private bool IsInCorrectPlace(List<int> issue, int idx) 
       {
-         List<int>? rhs; 
          for (int i = 0; i < idx; ++i) 
          {
             if (CompareOrder(issue[i], issue[idx]) < 0) {

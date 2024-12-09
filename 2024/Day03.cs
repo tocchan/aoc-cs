@@ -12,7 +12,7 @@ namespace AoC2024
    {
       private string InputFile = "2024/inputs/03.txt";
 
-      private string Input; 
+      private string Input = ""; 
 
       //----------------------------------------------------------------------------------------------
       public override void ParseInput()
