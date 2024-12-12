@@ -430,6 +430,32 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public List<ivec2> GetMagicWandRegion(ivec2 pos, int val) 
+      {
+         HashSet<ivec2> visited = new(); 
+         Queue<ivec2> toCheck = new(); 
+
+         toCheck.Enqueue(pos); 
+
+         while (toCheck.Count > 0) {
+            ivec2 p = toCheck.Dequeue(); 
+            if (Get(p) != val) {
+               continue; 
+            }
+
+            if (!visited.Contains(p)) {
+               visited.Add(p); 
+               foreach (ivec2 dir in ivec2.DIRECTIONS) {
+                  ivec2 np = p + dir; 
+                  toCheck.Enqueue(np); 
+               }
+            }
+         }
+         
+         return visited.ToList(); 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public IntHeatMap2D FloodFill(ivec2 start, Func<int, int> costFunc)
       {
          IntHeatMap2D fill = new IntHeatMap2D(GetSize(), -1, -1);
