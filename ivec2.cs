@@ -80,6 +80,22 @@ namespace AoC
       public int Dot(ivec2 v) => x * v.x + y * v.y;
       public int GetLengthSquared() => x * x + y * y;
       public float GetLength() => MathF.Sqrt((float)GetLengthSquared());
+
+      public ivec2 GetReduced()
+      {
+         int gcd = (int) Util.GCD(x, y); 
+         if (gcd > 1) {
+            return new ivec2(x / gcd, y / gcd); 
+         } else {
+            return this; 
+         }
+      }
+
+      public bool IsColinear(ivec2 other) 
+      {
+         int det = x * other.y - other.x * y; 
+         return det == 0; 
+      }
       
       public int GetManhattanDistance() => Abs(this).Sum();
 
