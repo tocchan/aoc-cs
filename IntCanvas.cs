@@ -138,6 +138,14 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public void SetAll(int val) 
+      {
+         for (int i = 0; i < Data.Length; ++i) {
+            Data[i] = 0; 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       public void InitFromStringArray(string[] lines, Dictionary<char,int> values)
       {
          ivec2 size = new ivec2(lines[0].Length, lines.Length); 
@@ -410,7 +418,7 @@ namespace AoC
          for (int y = 0; y < size.y; ++y) {
             for (int x = 0; x < size.x; ++x) {
                ivec2 pos = MinSet + new ivec2(x, y);
-               int i = GetValue(pos);
+               int i = Math.Min(GetValue(pos), pal.Length - 1);
                ++idx;
                sb.Append(pal[i]);
             }
