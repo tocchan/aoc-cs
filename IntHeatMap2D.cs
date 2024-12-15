@@ -181,7 +181,11 @@ namespace AoC
          foreach (string line in lines) {
             foreach (char c in line) {
                int cval = valueMap.IndexOf(c);
-               Data[idx] = cval;
+               if (cval == -1) {
+                  Data[idx] = c; 
+               } else {
+                  Data[idx] = cval;
+               }
                ++idx;
             }
          }
@@ -346,6 +350,12 @@ namespace AoC
          }
 
          return null;
+      }
+
+      //----------------------------------------------------------------------------------------------
+      public ivec2? FindLocation(int val) 
+      {
+         return FindLocation((ivec2 p, int v) => v == val); 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -734,6 +744,27 @@ namespace AoC
             }
 
             sb.Append('\n'); 
+         }
+
+         return sb.ToString(); 
+      }
+
+      public string Draw(string pal = "") 
+      {
+         StringBuilder sb = new StringBuilder(); 
+         for (int y = 0; y < GetHeight(); ++y) {
+            if (y > 0) {
+               sb.Append('\n'); 
+            }
+
+            for (int x = 0; x < GetWidth(); ++x) {
+               int v = Get(x, y); 
+               if (v < pal.Length) {
+                  sb.Append(pal[v]);
+               } else {
+                  sb.Append((char)v); 
+               }
+            }
          }
 
          return sb.ToString(); 

@@ -67,6 +67,17 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public static bool AddUnique<T>(this List<T> list, T item)
+      {
+         if (list.Contains(item)) {
+            return false; 
+         } else {
+            list.Add(item); 
+            return true; 
+         }
+      }
+
+      //----------------------------------------------------------------------------------------------
       public static IEnumerable<List<T>> SplitAllWhen<T>(this List<T> list, Predicate<T> predicate)
       {
          List<T> copy = new List<T>(list); 
