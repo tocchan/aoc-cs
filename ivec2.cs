@@ -244,5 +244,14 @@ namespace AoC
          return EnumArea( size, ivec2.ZERO ); 
       }
 
+      public char ToDirChar() 
+      {
+         return this == ivec2.RIGHT ? '>'
+            : this == ivec2.LEFT ? '<'
+            : this == ivec2.UP ? '^'
+            : this == ivec2.DOWN ? 'v'
+            : 'x';
+      }
+
    }
 }
