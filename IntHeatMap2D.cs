@@ -498,9 +498,9 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
-      public ivec2 GetLowestNeighbor(ivec2 p)
+      public ivec2? GetLowestNeighbor(ivec2 p)
       {
-         ivec2 lowest = p;
+         ivec2? lowest = null;
          int lowestVal = Get(p);
 
          foreach (ivec2 dir in ivec2.DIRECTIONS) {
@@ -526,8 +526,13 @@ namespace AoC
 
          path.Add(dst);
          while (Get(dst) > 0) {
-            dst = GetLowestNeighbor(dst);
-            path.Add(dst);
+            ivec2? lowest = GetLowestNeighbor(dst);
+            if (lowest.HasValue) {
+               dst = lowest.Value; 
+               path.Add(dst);
+            } else {
+               break; 
+            }
          }
 
          path.Reverse();
