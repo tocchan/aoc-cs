@@ -161,5 +161,22 @@ namespace AoC
          }
          return eDirection.None;
       }
+
+      //----------------------------------------------------------------------------------------------
+      public static bool MatchesAt( this string s, string token, int offset ) 
+      {
+         int lenRemaining = s.Length - offset; 
+         if (token.Length <= lenRemaining) {
+            for (int i = 0; i < token.Length; ++i) {
+               if (s[i + offset] != token[i]) {
+                  return false; 
+               }
+            }
+
+            return true; 
+         }
+
+         return false;
+      }
    }
 }
