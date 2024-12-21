@@ -615,6 +615,12 @@ namespace AoC
       }
 
       //----------------------------------------------------------------------------------------------
+      public IntHeatMap2D DijkstraFlood(ivec2 end) 
+      {
+         return DijkstraFlood(end, (ivec2 from, ivec2 to) => { return 1; }  ); 
+      }
+
+      //----------------------------------------------------------------------------------------------
       public List<ivec2> FindPathDijkstra(ivec2 start, ivec2 end, Func<ivec2,ivec2,int> cost) 
       {
          int[] paths; 
