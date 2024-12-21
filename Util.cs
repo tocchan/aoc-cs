@@ -381,5 +381,20 @@ namespace AoC
       public static bool IsLetter(char c) => ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')); 
 
       public static bool IsAlphaNumeric(char c) => IsDigit(c) || IsLetter(c); 
+
+      //----------------------------------------------------------------------------------------------
+      public static string GetRepeatedChar(char c, int count) 
+      {
+         if (count == 0) {
+            return ""; 
+         }
+
+         char[] str = new char[count]; 
+         for (int i = 0; i < count; ++i) {
+            str[i] = c; 
+         }
+
+         return new string(str); 
+      }
    }
 }
