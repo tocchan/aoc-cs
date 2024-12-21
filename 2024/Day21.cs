@@ -11,7 +11,7 @@ namespace AoC2024
 {
    internal class Day21 : Day
    {
-      private string InputFile = "2024/inputs/21d.txt";
+      private string InputFile = "2024/inputs/21.txt";
 
 
       //----------------------------------------------------------------------------------------------
@@ -46,6 +46,45 @@ namespace AoC2024
          Keypad['>'] = new ivec2(2, 1); 
       }
 
+      List<List<ivec2>> GetAllOptions(Dictionary<char, ivec2> pad, ivec2 startLoc, ivec2 endLoc)
+      {
+         List<List<ivec2>> paths = new(); 
+         List<ivec2> path = new(); 
+         AddOption(paths, path, pad, startLoc, endLoc); 
+
+         return paths; 
+      }
+
+      void AddOption(List<List<ivec2>> paths, List<ivec2> curPath, Dictionary<char, ivec2> pad, ivec2 curLoc, ivec2 endLoc) 
+      {
+         if (curLoc == endLoc) {
+            paths.Add(curPath); 
+            return; 
+         }
+
+         if (!pad.ContainsValue(curLoc)) {
+            return; // not a valid path
+         }
+
+
+         ivec2 disp = endLoc - curLoc; 
+         ivec2 dirs = ivec2.Sign(disp); 
+
+         if (dirs.x != 0) {
+            List<ivec2> newPath = new List<ivec2>(curPath); // copy, as we'll be adding new options to it
+            ivec2 move = new ivec2(dirs.x, 0); 
+            newPath.Add(move); 
+            AddOption(paths, newPath, pad, curLoc + move, endLoc); 
+         }
+
+         if (dirs.y != 0) {
+            List<ivec2> newPath = new List<ivec2>(curPath); // copy, as we'll be adding new options to it
+            ivec2 move = new ivec2(0, dirs.y); 
+            newPath.Add(move); 
+            AddOption(paths, newPath, pad, curLoc + move, endLoc); 
+         }
+      }
+
       Int64 GetShortest(char start, char end, Dictionary<char, ivec2> pad, int levels) 
       {
          ivec2 startLoc = pad[start]; 
@@ -60,42 +99,20 @@ namespace AoC2024
          ivec2 hCorner = startLoc + new ivec2(disp.x, 0); 
          ivec2 vCorner = startLoc + new ivec2(0, disp.y); 
 
-         string hFirst = ""; 
-         string vFirst = ""; 
-         if (pad.ContainsValue(hCorner)) {
-            if (disp.x > 0) {
-               hFirst += Util.GetRepeatedChar('>', disp.x); 
-            } else if (disp.x < 0) {
-               hFirst += Util.GetRepeatedChar('<', -disp.x); 
+         List<List<ivec2>> paths = GetAllOptions(pad, startLoc, endLoc); 
+
+         Int64 shortest = Int64.MaxValue; 
+         foreach (List<ivec2> path in paths) {
+            string pathStr = ""; 
+            foreach (ivec2 dir in path) {
+               pathStr += dir.ToDirChar(); 
             }
 
-            if (disp.y > 0) {
-               hFirst += Util.GetRepeatedChar('v', disp.y); 
-            } else if (disp.y < 0) {
-               hFirst += Util.GetRepeatedChar('^', -disp.y); 
-            }
-
-            hFirst += 'A'; 
+            pathStr += 'A'; 
+            shortest = Math.Min(shortest, GetShortest(pathStr, Keypad, levels - 1)); 
          }
 
-         if (pad.ContainsValue(vCorner)) {
-            if (disp.y > 0) {
-               vFirst += Util.GetRepeatedChar('v', disp.y); 
-            } else if (disp.y < 0) {
-               vFirst += Util.GetRepeatedChar('^', -disp.y); 
-            }
-
-            if (disp.x > 0) {
-               vFirst += Util.GetRepeatedChar('>', disp.x); 
-            } else if (disp.x < 0) {
-               vFirst += Util.GetRepeatedChar('<', -disp.x); 
-            }
-
-            vFirst += 'A'; 
-         }
-
-
-         return Math.Min(GetShortest(hFirst, Keypad, levels - 1), GetShortest(vFirst, Keypad, levels - 1)); 
+         return shortest; 
       }
 
       Dictionary<int, Dictionary<int, Int64>> Cache = new(); 
@@ -164,28 +181,6 @@ namespace AoC2024
          }
 
          return ans.ToString(); 
-
-         // v <vA 3
-         // < <A 5
-         // < A 6
-         // A >>^A 10
-         // > vA 12
-         // > A 13
-         // ^ <^A 16
-         // A<A>AvA<^AA>A<vAAA>^A  >A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
-
-         /*
-         string test = "v<<A>>^A<A>AvA<^AA>A<vAAA>^A"; 
-         for (int i = 1; i < test.Length; ++i) {
-            string token = test.Substring(0, i); 
-            int testLen = GetShortest(token, Keypad, 1); 
-            Util.WriteLine($"{token} -> {testLen}"); 
-         }
-         */
-
-         // int len2 = GetShortest("v<<A>>^A<A>AvA<^AA>A<vAAA>^A", Keypad, 1);
-         // int len2 = GetShortest(">^", Keypad, 1); 
-         // return len.ToString(); 
       }
 
       //----------------------------------------------------------------------------------------------
@@ -196,20 +191,9 @@ namespace AoC2024
             Int64 shortest = GetShortest(code, Numpad, 26); 
             Int64 codeVal = Int64.Parse(code.Substring(0, code.Length - 1)); 
 
-            Util.WriteLine($"{code} * {shortest} = {shortest * codeVal}"); 
+            // Util.WriteLine($"{code} * {shortest} = {shortest * codeVal}"); 
             ans += shortest * codeVal; 
          }
-
-         Util.WriteLine("---"); 
-         for (int i = 3; i <= 26; ++i) {
-            Int64 shortest = GetShortest(Codes[0], Numpad, i); 
-            Int64 codeVal = Int64.Parse(Codes[0].Substring(0, Codes[0].Length - 1)); 
-            Util.WriteLine($"{codeVal} * {shortest} = {shortest * codeVal}"); 
-         }
-
-
-         //       220,684,114,439,922
-         // 9,223,372,036,854,775,807
 
          return ans.ToString(); 
       }
