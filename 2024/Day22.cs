@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace AoC2024
 {
    internal class Day22 : Day
    {
-      private string InputFile = "2024/inputs/22d.txt";
+      private string InputFile = "2024/inputs/22.txt";
 
 
       //----------------------------------------------------------------------------------------------
@@ -122,59 +123,64 @@ namespace AoC2024
          }
       }
 
+      public Dictionary<int, int> GetPriceLookup(Int64 code, int iterations)
+      {
+         Dictionary<int, int> lookup = new(); 
+
+         Int64 key = 0; 
+         Int64 prev = code % 10; 
+         for (int i = 0; i < iterations; ++i) {
+            code = ComputeNext(code); 
+            Int64 next = code % 10; 
+            Int64 diff = next - prev; 
+            prev = next; 
+
+            key = ((key & 0x00ffffff) << 8) | (diff + 10); // make sure it is positive
+            if (i >= 3) {
+               int actualKey = (int) key; 
+               if (!lookup.ContainsKey(actualKey)) {
+                  lookup.Add(actualKey, (int) next); 
+               }
+            }
+         }
+
+         return lookup; 
+      }
+
       //----------------------------------------------------------------------------------------------
       public override string RunB()
       {
-         List<string> sequences = new(); 
-         List<string> prices = new(); 
-         HashSet<string> subsequenceSet = new(); 
-
+         List<Dictionary<int, int>> lookups = new(); 
          foreach (Int64 code in Inputs) {
-            string price; 
-            sequences.Add(GetSequence(code, 2000, out price)); 
-            prices.Add(price); 
+            lookups.Add( GetPriceLookup(code, 2000) ); 
          }
 
-         /*
-         foreach (string seq in sequences) {
-            GetAllSubsequences(subsequenceSet, seq); 
-         }
-         */
-         GetAllSubsequences(subsequenceSet, sequences[0]); 
-
-         // best seq was @CAA for the real input?
-
-         // ">?@A" // ascii values before A for testing
-         string p;
-         string s = GetSequence(123, 10, out p); 
-         Int64 tp = GetPrice(p, s, "@@AC"); 
-         Util.WriteLine($"{s} - {p} - {tp}"); 
-
-         string testSeq = "?B@D"; // -2 1 -1 3
-         for (int testIdx = 0; testIdx < prices.Count; ++testIdx) {
-            Int64 testVal = GetPrice(prices[testIdx], sequences[testIdx], testSeq); 
-            Int64 testPrice = GetTotalPrice(prices, sequences, testSeq); 
-            Util.WriteLine($"{testPrice} - {testVal}"); 
-         }
-
-         Int64 bestPrice = 0; 
-         string bestSeq = ""; 
-
-         int working = 0; 
-         foreach (string subseq in subsequenceSet) {
-            Int64 newPrice = GetTotalPrice(prices, sequences, subseq); 
-            if (newPrice > bestPrice) {
-               bestPrice = newPrice; 
-               bestSeq = subseq; 
-            }
-
-            ++working; 
-            if ((working % 1000) == 0) {
-               Util.WriteLine($"{working} / {subsequenceSet.Count}"); 
+         HashSet<int> uniqueKeys = new(); 
+         foreach (Dictionary<int, int> lookup in lookups) {
+            foreach (int key in lookup.Keys) {
+               uniqueKeys.Add(key); 
             }
          }
 
-         Util.WriteLine($"BestSeq: {bestSeq}"); 
+         // -2, 1, -1, 3
+         // int testKey = (8 << 24) | (11 << 16) | (9 << 8) | 13; 
+
+         // -1 -1 0 2
+         // int testKey = (9 << 24) | (9 << 16) | (10 << 8) | 12; 
+         // Util.WriteLine(lookups[3][testKey].ToString()); 
+
+         int bestPrice = 0; 
+         foreach (int key in uniqueKeys) {
+            int price = 0; 
+            foreach (Dictionary<int, int> lookup in lookups) {
+               int cost = 0; 
+               if (lookup.TryGetValue(key, out cost)) {
+                  price += cost; 
+               }
+            }
+
+            bestPrice = Math.Max(price, bestPrice); 
+         }
 
          return bestPrice.ToString(); 
       }
