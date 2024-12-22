@@ -58,8 +58,6 @@ namespace AoC2024
          return code; 
       }
 
-      
-
       //----------------------------------------------------------------------------------------------
       public override string RunA()
       {
@@ -71,58 +69,7 @@ namespace AoC2024
          return sum.ToString(); 
       }
 
-//----------------------------------------------------------------------------------------------
-      string GetSequence(Int64 code, Int64 count, out string priceSeq) 
-      {
-         List<char> costs = new(); 
-         Int64 prev = code % 10; 
-
-         priceSeq = ""; 
-         priceSeq += (char)('A' + prev); 
-
-         for (int i = 0; i <= count; ++i) {
-
-            code = ComputeNext(code); 
-            Int64 next = code % 10; 
-            Int64 diff = next - prev; 
-            costs.Add((char)('A' + diff)); 
-
-            prev = next; 
-            priceSeq += (char)('A' + prev); 
-         }
-
-         return new string(costs.ToArray()); 
-      }
-
       //----------------------------------------------------------------------------------------------
-      public Int64 GetPrice(string price, string seq, string subseq) 
-      {
-         int loc = seq.IndexOf(subseq); 
-         if (loc >= 0) {
-            return price[loc + 4] - 'A'; 
-         }
-
-         return 0; 
-      }
-
-      public Int64 GetTotalPrice(List<string> prices, List<string> sequences, string seq) 
-      {
-         Int64 price = 0; 
-         for (int i = 0; i < sequences.Count; ++i) {
-            price += GetPrice(prices[i], sequences[i], seq); 
-         }
-
-         return price; 
-      }
-
-      //----------------------------------------------------------------------------------------------
-      public void GetAllSubsequences(HashSet<string> subseq, string seq)
-      {
-         for (int i = 1; i < seq.Length - 4; ++i) {
-            subseq.Add(seq.Substring(i, 4)); 
-         }
-      }
-
       public Dictionary<int, int> GetPriceLookup(Int64 code, int iterations)
       {
          Dictionary<int, int> lookup = new(); 
@@ -168,7 +115,6 @@ namespace AoC2024
          // -1 -1 0 2
          // int testKey = (9 << 24) | (9 << 16) | (10 << 8) | 12; 
          // Util.WriteLine(lookups[3][testKey].ToString()); 
-
          int bestPrice = 0; 
          foreach (int key in uniqueKeys) {
             int price = 0; 
