@@ -207,6 +207,7 @@ namespace AoC2024
                Util.WriteLine("bad"); 
             }
             */
+            
 
             bool hasT = false; 
             foreach (Node n in cluster) {
