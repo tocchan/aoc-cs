@@ -207,7 +207,7 @@ namespace AoC2024
                Util.WriteLine("bad"); 
             }
             */
-            
+
 
             bool hasT = false; 
             foreach (Node n in cluster) {
@@ -258,7 +258,7 @@ namespace AoC2024
 
          string pw = ""; 
          for (int i = maxPossible; i >= 3; --i) {
-            List<List<Node>> clusters = OriginalGraph.FindCompleteSubgraphs(i, false); 
+            List<List<Node>> clusters = OriginalGraph.FindCompleteSubgraphs(i, true); 
             
             if (clusters.Count != 0) {
                pw = ClusterToString(clusters[0]); 
