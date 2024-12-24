@@ -190,6 +190,7 @@ namespace AoC2024
             Stack<Circuit> toCheck = new(); 
             HashSet<string> results = new(); 
 
+            results.Add(reg); 
             toCheck.Push(c); 
             while (toCheck.Count > 0) {
                Circuit circuit = toCheck.Pop(); 
@@ -281,7 +282,7 @@ namespace AoC2024
          }
       }
 
-      bool TryFix(string lh, string rh, Int64 testVal) 
+      bool TryFix(string lh, string rh, Int64 testVal, int tryIdx) 
       {
          // now, try to swap until this succeeds?
          if (!TheMachine.Swap(lh, rh)) {
@@ -290,7 +291,7 @@ namespace AoC2024
 
          TheMachine.Reset(); 
          Int64 newVal = TheMachine.GetRegisterValue('z');
-         if (newVal == testVal) {
+         if (((newVal ^ testVal) & (1L << tryIdx)) == 0) {
             return true;
          } else {
             TheMachine.Swap(rh, lh); 
@@ -327,66 +328,72 @@ namespace AoC2024
          return result; 
       }
 
-      bool TryFixMachine(int startIdx, List<string> candidates, List<string> swaps)
+      List<string> GetPotentialProblemChildren(Int64 diff) 
+      {
+         HashSet<string> result = new(); 
+
+         for (int i = 0; i < 46; ++i) {
+            if ((diff & (1L << i)) != 0) {
+               string regName = 'z' + i.ToString("D2"); 
+               List<string> feeders = TheMachine.GetFeedingRegisters(regName); 
+               foreach (string f in feeders) {
+                  result.Add(f); 
+               }
+            }
+         }
+
+         return result.ToList(); 
+      }
+
+      bool TryFixMachine(List<string> candidates, List<string> swaps, Int64 lh, Int64 rh, int depth = 0)
       {
          int regCount = TheMachine.GetRegisterCount('z'); 
 
          // get first error
-         List<(Int64, Int64)> toCheck = new(); 
-         toCheck.Add((Int64.MaxValue, Int64.MaxValue)); 
-         toCheck.Add((0, Int64.MaxValue)); 
-         toCheck.Add((Int64.MaxValue, 0)); 
-         toCheck.Add((0xAAAAAAAAAAAAAAL, 0x55555555555555L)); 
+         TheMachine.SetRegisterValue('x', lh); 
+         TheMachine.SetRegisterValue('y', rh); 
+         Int64 zVal = TheMachine.GetRegisterValue('z'); 
+         Int64 expected = lh + rh; 
 
-         for (int i = startIdx; i < regCount; ++i) {
-            Int64 mask = (1L << i) - 1; 
-
-            foreach ((Int64 lhv, Int64 rhv) in toCheck) {
-               TheMachine.Reset(); 
-
-               Int64 lh = lhv & mask; 
-               Int64 rh = rhv & mask; 
-               TheMachine.SetRegisterValue('x', lh); 
-               TheMachine.SetRegisterValue('y', rh); 
-               Int64 zVal = TheMachine.GetRegisterValue('z'); 
-               Int64 expected = lh + rh; 
-
-               if (expected != zVal) {
-                  int tryIdx = GetMismatchedIndex(expected, zVal); 
-                  // do 
-                  {
-                     string regName = 'z' + (tryIdx).ToString("D2"); 
-
-                     List<string> possibleRegisters = TheMachine.GetFeedingRegisters(regName); 
-                     possibleRegisters = possibleRegisters.Intersect(candidates).ToList();
-
-                     List<(string, string)> combos = Mix(possibleRegisters, candidates); 
-                     foreach ((string lhs, string rhs) in combos) {
-                        if (TryFix(lhs, rhs, expected)) {
-                           List<string> newCandidates = new List<string>(candidates); 
-
-                           Util.WriteLine($"Attempting swap at {tryIdx} of {lhs} <-> {rhs}"); 
-                           if (TryFixMachine(i + 1, newCandidates, swaps)) {
-                              swaps.Add(lhs); 
-                              swaps.Add(rhs); 
-                              return true; 
-                           } else {
-                              TheMachine.Swap(lhs, rhs); // undo the fix
-                           }
-                        }
-                     }
-                     ++tryIdx; 
-                  }
-                  // while ((tryIdx < regCount) && (tryIdx <= i + 1)); 
-
-                  
-
-               } else if (i >= 2) {
-                  // string regName = 'z' + (i - 2).ToString("D2"); 
-                  // List<string> safe = TheMachine.GetFeedingRegisters(regName); 
-                  // Subtract(candidates, safe); 
-               }
+         if (expected != zVal) {
+            if (depth >= 4) { 
+               return false; // know answer will be at most 4 pairs
             }
+
+            Int64 diff = expected ^ zVal; 
+            List<string> swapTargets = GetPotentialProblemChildren(diff).Intersect(candidates).ToList(); 
+
+            int tryIdx = GetMismatchedIndex(expected, zVal); 
+            // do 
+            {
+               string regName = 'z' + (tryIdx).ToString("D2"); 
+
+               List<string> possibleRegisters = TheMachine.GetFeedingRegisters(regName); 
+               possibleRegisters = possibleRegisters.Intersect(swapTargets).ToList();
+
+               List<(string, string)> combos = Mix(possibleRegisters, swapTargets); 
+               foreach ((string lhs, string rhs) in combos) {
+                  if (TryFix(lhs, rhs, expected, tryIdx)) {
+
+                     swapTargets.Remove(lhs); 
+                     swapTargets.Remove(rhs); 
+
+                     Util.WriteLine($"Attempting swap at {tryIdx} of {lhs} <-> {rhs}"); 
+                     if (TryFixMachine(swapTargets, swaps, lh, rh, depth + 1)) {
+                        swaps.Add(lhs); 
+                        swaps.Add(rhs); 
+                        return true; 
+                     } else {
+                        TheMachine.Swap(lhs, rhs); // undo the fix
+                        swapTargets.Add(lhs); 
+                        swapTargets.Add(rhs); 
+                     }
+                  }
+               }
+               ++tryIdx; 
+            }
+
+            return false; 
          }
 
          return true; 
@@ -397,18 +404,8 @@ namespace AoC2024
       {
          Int64 lh = TheMachine.GetRegisterValue('x'); 
          Int64 rh = TheMachine.GetRegisterValue('y'); 
-         Int64 result = TheMachine.GetRegisterValue('z'); 
-         Int64 correctResult = lh + rh; 
 
          int regCount = TheMachine.GetRegisterCount('z'); 
-         Int64 mismatch = result ^ correctResult; 
-
-         List<string> swaps = new(); 
-         List<string> candidates = TheMachine.GetPossibleRegisters(); 
-         TryFixMachine(1, candidates, swaps); 
-
-         swaps.Sort(); 
-         Util.WriteLine(string.Join(',', swaps)); 
 
          Int64 testVal = (1L << (regCount - 1)) - 1; 
          lh = testVal; 
@@ -416,15 +413,20 @@ namespace AoC2024
 
          TheMachine.SetRegisterValue('x', lh); 
          TheMachine.SetRegisterValue('y', rh); 
-         TheMachine.Reset(); 
-         result = TheMachine.GetRegisterValue('z');
 
-         int wrongIdx = GetMismatchedIndex(lh + rh, result); 
-         Util.WriteLine($"Mismatch at index: {wrongIdx}"); 
+         List<string> swaps = new(); 
+         List<string> candidates = TheMachine.GetPossibleRegisters(); 
+         TryFixMachine(candidates, swaps, lh, rh); 
+
+         swaps.Sort(); 
+         string ans = string.Join(',', swaps); 
+        
+         TheMachine.Reset(); 
+         Int64 result = TheMachine.GetRegisterValue('z');
 
          Util.WriteLine(Convert.ToString(result, 2)); 
          Util.WriteLine(Convert.ToString(lh + rh, 2)); 
-         return ""; 
+         return ans; 
       }
    }
 }
