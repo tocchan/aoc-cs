@@ -460,9 +460,8 @@ namespace AoC2024
 
          for (int i = startIdx; i < regCount; ++i) {
 
-            Int64 xval = (1L << i) - 1; 
-            Int64 yval = xval & 0x7AAAAAAAAAAAAAAAL; 
-            xval = xval & 0x555555555555555L;
+            Int64 xval = (1L << (i + 1)) - 1; 
+            Int64 yval = xval & 0x5555555555555555L;
             Int64 expected = xval + yval; 
 
             TheMachine.Reset(); 
@@ -490,11 +489,13 @@ namespace AoC2024
                List<string> filtered = FilterToLevel(candidates, mismatchIdx); 
                List<string> search = used.Intersect(filtered).ToList(); 
 
+               /*
                if (regName == "z23") {
                   candidates.Sort(); 
                   filtered.Sort(); 
                   Util.WriteLine("what is going on"); 
                }
+               */
 
                Subtract(filtered, search); 
 
@@ -532,14 +533,6 @@ namespace AoC2024
                   }
 
                   if (wasFixed) {
-                     if (lh == "z23") {
-                        Util.WriteLine("what is going on"); 
-                     }
-
-                     if (depth < 1) {
-                        Util.WriteLine($"{depth}: ({comboIdx}/{combos.Count} - attempting swap {lh} <-> {rh} at bit {mismatchIdx}"); 
-                     }
-                     
                      Subtract(candidates, used); 
                      if (TryFixMachine(mismatchIdx + 1, candidates, swaps, depth + 1, Math.Max(mismatchIdx, highestBit))) {
                         Util.WriteLine($"Adding Swap: ({lh},{rh})");
@@ -611,12 +604,10 @@ namespace AoC2024
          List<string> swaps = new(); 
          List<string> candidates = TheMachine.GetPossibleRegisters(); 
 
-         /*
-         TheMachine.Swap("svm", "nbc"); 
-         TheMachine.Swap("z15", "kqk"); 
-         TheMachine.Swap("z23", "cgq"); 
-         TheMachine.Swap("z39", "fnr"); 
-         */
+         // TheMachine.Swap("svm", "nbc"); 
+         // TheMachine.Swap("z15", "kqk"); 
+         // TheMachine.Swap("z23", "cgq"); 
+         // TheMachine.Swap("z39", "fnr"); 
          
          TryFixMachine(0, candidates, swaps); 
          TryFixMachine(0, candidates, swaps); 
